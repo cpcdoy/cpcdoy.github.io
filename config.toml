@@ -1,0 +1,80 @@
+baseURL = 'http://example.org/'
+languageCode = 'en-us'
+title = 'EPITA: Deep Learning Course by Chady Dimachkie'
+theme = 'digitalgarden'
+
+
+googleAnalytics = "UA-PROPERTY_ID"
+
+[Params]
+description = "Deep Learning Course by Chady Dimachkie"
+images = ['/digital-garden-logo.png']
+enableSearch = true
+
+[Params.newsletter]
+title = "Subscribe to the class newsletter"
+description = "To stay up to date on the class news."
+
+# Supports buttondown, substack and revue
+provider = "buttondown"
+
+# Buttondown - URL from share page; Refer: https://blog.buttondown.email/2019/10/11/adding-a-buttondown-subscription-form-to-webflow#getting-your-subscription-url
+# Substack - URL of the newsletter homepage; Example: https://on.substack.com/
+# Revue - Username
+path = "https://buttondown.email/api/emails/embed-subscribe/"
+
+[menu]
+[[menu.main]]
+name = 'Home'
+url = '/'
+weight = 1
+[[menu.main]]
+name = 'Content'
+params.header = true
+weight = 2
+[[menu.main]]
+name = 'Articles'
+url = '/articles'
+weight = 3
+[[menu.main]]
+name = 'Portfolio'
+url = '/portfolio'
+weight = 4
+[[menu.main]]
+name = 'Other'
+params.header = true
+weight = 5
+[[menu.main]]
+name = 'Stack'
+url = '/stack'
+weight = 6
+[[menu.main]]
+name = 'Links'
+url = '/links'
+weight = 7
+
+[[menu.social]]
+name = 'GitHub'
+url = 'https://github.com/cpcdoy'
+weight = 1
+[[menu.social]]
+name = 'LinkedIn'
+url = 'https://linkedin.com'
+weight = 2
+[[menu.social]]
+name = 'Medium'
+url = 'https://chadydimachkie.medium.com/'
+weight = 3
+[[menu.social]]
+name = 'Email'
+url = 'mailto:user@example.org'
+weight = 4
+
+
+# syntax highlight settings
+[markup]
+[markup.highlight]
+style = "dracula"
+[markup.goldmark.renderer]
+# Enable to include inline HTML
+unsafe = true

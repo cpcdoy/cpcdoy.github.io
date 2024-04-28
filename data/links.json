@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Python 3 Refresher",
+    "description": "If you forgot how to use Python 3, here's a refresher Jupyter notebook",
+    "link": "https://colab.research.google.com/drive/1aS_0hiBPiyvUnswWIEyeblwweSXb5CVA?usp=sharing",
+    "icon": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg",
+    "tag": "Python3"
+  },
+  {
+    "name": "Cloudflare",
+    "description": "Place for all my domains on the internet",
+    "link": "https://cloudflare.com",
+    "icon": "",
+    "tag": "Webdev"
+  }
+]
