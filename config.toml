@@ -37,21 +37,25 @@ name = 'Articles'
 url = '/articles'
 weight = 3
 [[menu.main]]
-name = 'Portfolio'
-url = '/portfolio'
-weight = 4
-[[menu.main]]
 name = 'Other'
 params.header = true
-weight = 5
+weight = 4
 [[menu.main]]
 name = 'Stack'
 url = '/stack'
-weight = 6
+weight = 5
 [[menu.main]]
 name = 'Links'
 url = '/links'
+weight = 6
+[[menu.main]]
+name = 'About me'
+params.header = true
 weight = 7
+[[menu.main]]
+name = 'Portfolio'
+url = '/portfolio'
+weight = 8
 
 [[menu.social]]
 name = 'GitHub'
