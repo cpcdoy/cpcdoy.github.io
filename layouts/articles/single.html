@@ -2,7 +2,6 @@
 
 {{ $permalink := .RelPermalink }}
 {{ $date := .Date.Format "January 2, 2006" }}
-{{ $lastmod := .Lastmod.Format "January 2, 2006" }}
 
 <div class="flex flex-1 h-screen relative w-full min-w-0">
 
@@ -45,9 +44,6 @@
 
 	  {{ if .Date }}
       <p class="text-sm text-slate-500 !mb-8"> {{ $date }}
-		{{ if ne $lastmod $date}}
-			<br/> Pruned {{ .Lastmod.Format "January 2, 2006" }}
-        {{ end }}
 	  </p>
       {{ end }}
 
