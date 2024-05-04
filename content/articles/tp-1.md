@@ -69,7 +69,11 @@ def create_dataset(n_data:int = 100, a:float = -1.0, b:float = 5, scale:int = 15
 
 ![linear_fit](/tp_1_linear_fit_no_noise.png)
 
-Now, let's make it slightly more interesting and make it only look like it's a linear function. For that we'll add some noise. You'll see later that data you find in real life has a lot of noise, meaning it's not perfect.
+Now, let's make it slightly more interesting and make it only look like it's a linear function. For that we'll add some noise. You'll see later that the data you find in real world scenarios has a lot of noise, meaning it's usually not perfect.
+
+<exercisequote>
+Plot the above dataset using `matplotlib` and then play with each parameter
+</exercisequote>
 
 
 ```Python
@@ -199,12 +203,57 @@ In our case, we'll use:
 What is the difference between Stochastic Gradient Descent (SGD) and the usual Gradient Descent (GD)?
 </questionquote>
 
+In terms of code, it's quite simple to create these two objects:
+
 ```Python
+# Instantiate an SGD Optimizer that will work on our network's parameters (weights) with a learning rate of 0.05
 optimizer = torch.optim.SGD(net.parameters(), lr=0.05)
+
+# Instantiate the MSE Loss
 loss_func = torch.nn.MSELoss()
 ```
 
+And then to apply *gradient descent* and compute the *loss function*, we simply do:
 
+```Python
+# We simply call the function we made in the previous chapter
+# It'll generate our linear looking dataset
+x, y = create_dataset()
+
+for t in range(num_steps):
+    # Compute predictions from our training set `X_train`
+    prediction = net(x)
+
+    # The inputs to the loss function are:
+    # 1. Our model's current predictions
+    # 2. the target outputs y_train
+    loss = loss_func(prediction, y)     
+
+    # We need to clear the gradients from the previous iteration
+    # because PyTorch stores them in case we need them.
+    # In our case we don't need to remember what happened the previous step
+    optimizer.zero_grad()
+    # We compute backpropagation to get the gradients
+    loss.backward()
+    # We do one iteration of SGD
+    optimizer.step()
+```
+
+And that's it!
+
+No formulas are needed on our end, PyTorch computes everything internally.
+
+<questionquote>
+How would you test that the neural network we just trained actually works?
+</questionquote>
+
+#### Let's look into what's happening
+
+
+
+<questionquote>
+How do I determine the correct number of steps needed to converge? How do I decide the correct learning rate?
+</questionquote>
 
 # Send it to me!
 
