@@ -3,7 +3,68 @@
 {{ $permalink := .RelPermalink }}
 {{ $date := .Date.Format "January 2, 2006" }}
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+</script>
+<script type="text/javascript"
+  src="http://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<style>
+  questionquote {
+    display:flex;
+    box-sizing:border-box;
+    align-items: center;
+    box-sizing:border-box;
+    position:relative;
+    border:4px solid #3897FF;
+    border-radius:4px;
+    padding:0.5em 1em;
+    background:var(--bg, white);
+    font-size:0.8rem;
+    margin:4em;
+    min-height:4em;
+  }
+  questionquote:before {
+    content:url('data:image/svg+xml,<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve" fill="%23000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path style="fill:%238BC0FF;" d="M222.609,478.609C222.609,497.05,237.558,512,256,512l11.13-33.391L256,445.217 C237.558,445.217,222.609,460.168,222.609,478.609z"></path><path style="fill:%233897FF;" d="M256,445.217V512c18.442,0,33.391-14.95,33.391-33.391S274.442,445.217,256,445.217z"></path><g><path style="fill:%238BC0FF;" d="M233.32,281.163l-10.711,9.913v109.62H256l22.261-70.312L256,260.072 C243.217,272,233.559,280.941,233.32,281.163z"></path><path style="fill:%238BC0FF;" d="M107.965,148.035h66.783c0-44.802,36.45-81.252,81.252-81.252l22.261-33.391L256,0 C174.374,0,107.965,66.409,107.965,148.035z"></path></g><path style="fill:%233897FF;" d="M256,0v66.783c44.802,0,81.252,36.45,81.252,81.252c0,21.703-8.452,42.108-23.798,57.454 c-12.035,12.034-38.268,36.677-57.454,54.583v140.624h33.391v-80.459c18.43-17.133,55.505-51.747,71.285-67.525 c27.961-27.961,43.359-65.136,43.359-104.677C404.035,66.409,337.627,0,256,0z"></path></g></svg>');
+    width:70px;
+    height:67px;
+    flex-shrink:0;
+    align-self: flex-start;
+    margin:-25px 2em -4px -50px;
+    background:var(--bg, white);
+    border-radius: 50% 50% 10px 50%;
+  }
+
+  notequote {
+    display:flex;
+    box-sizing:border-box;
+    align-items: center;
+    box-sizing:border-box;
+    position:relative;
+    border:4px solid #FF9811;
+    border-radius:4px;
+    padding:0.5em 1em;
+    background:var(--bg, white);
+    font-size:0.8rem;
+    margin:4em;
+    min-height:4em;
+  }
+  notequote:before {
+    content: url('data:image/svg+xml,<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 385 385" xml:space="preserve" fill="%23000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><g id="XMLID_1027_"><polygon id="XMLID_1029_" style="fill:%23FF9811;" points="77.326,355 83.327,385 233.318,355 157.5,355 "></polygon><polygon id="XMLID_1030_" style="fill:%23FF9811;" points="307.5,340.163 377.5,326.162 318.663,31.988 203.612,55 307.5,55 "></polygon><path id="XMLID_1031_" style="fill:%23FFE98F;" d="M157.5,150c-24.813,0-45-20.186-45-45V85h30v20c0,8.271,6.729,15,15,15V55h-15h-30 H7.5v300h69.826H157.5V150z"></path><path id="XMLID_1032_" style="fill:%23FFDA44;" d="M307.5,340.163V55H203.612H202.5v50c0,24.814-20.187,45-45,45v205h75.818H307.5 V340.163z"></path><path id="XMLID_1033_" style="fill:%23FFDA44;" d="M172.5,105V55h-15v65C165.771,120,172.5,113.271,172.5,105z"></path><path id="XMLID_1034_" style="fill:%23565659;" d="M142.5,45c0-8.271,6.729-15,15-15s15,6.729,15,15v10v50c0,8.271-6.729,15-15,15 s-15-6.729-15-15V85h-30v20c0,24.814,20.187,45,45,45s45-20.186,45-45V55V45c0-24.813-20.187-45-45-45s-45,20.187-45,45v10h30V45z"></path></g></g></svg>');
+    width:70px;
+    height:67px;
+    flex-shrink:0;
+    align-self: flex-start;
+    margin:-25px 2em -4px -50px;
+    background:var(--bg, white);
+    border-radius: 50% 50% 10px 50%;
+  }
+</style>
+
 <div class="flex flex-1 h-screen relative w-full min-w-0">
+
 
   <section
     class="will-change-transform transform transition-transform -translate-x-[200%] absolute top-0 left-0 lg:relative
