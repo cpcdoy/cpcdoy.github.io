@@ -6,7 +6,9 @@ title: Homepage
 
 **Welcome to the Deep Learning Course!**
 
-Please register your team for this class:
+You'll find tutorials and practical work in the [Articles](/articles) section.
+
+If you need some 
 
 <!-- 
 <script src="https://static.elfsight.com/platform/platform.js" data-use-service-core defer></script>

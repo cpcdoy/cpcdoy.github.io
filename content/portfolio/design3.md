@@ -1,9 +1,10 @@
 ---
-title: Apple cream vanilla apple marzipan muffin
-date: 2021-12-16
+title: Multilingual Named Entity Recognition for Financial Transactions
+date: 2022-3-19
 images:
-- https://picsum.photos/id/102/400/300
-description: Apple orange tiramisu jelly ipsum sugar. Candy cake orange ipsum orange muffin.
+- https://miro.medium.com/v2/resize:fit:1400/format:webp/0*xhUe2aS-8nzKT2JI
+description: Advancing multilingual Named Entity Recognition for financial transaction enrichment
+link: https://medium.com/ntropy-network/multilingual-named-entity-recognition-for-financial-transactions-417b8871bcc
 ---
 
 Tiramisu sprinkles marzipan lollipop marzipan dolor. Jelly candy marzipan vanilla candy ipsum. Sugar croissant lollipop vanilla cream marzipan. Sprinkles croissant cream dolor jelly marzipan. 

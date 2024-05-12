@@ -11,9 +11,9 @@ description = "Deep Learning Course by Chady Dimachkie"
 images = ['/digital-garden-logo.png']
 enableSearch = true
 
-[Params.newsletter]
-title = "Subscribe to the class newsletter"
-description = "To stay up to date on the class news."
+# [Params.newsletter]
+# title = "Subscribe to the class newsletter"
+# description = "To stay up to date on the class news."
 
 # Supports buttondown, substack and revue
 provider = "buttondown"
@@ -33,17 +33,17 @@ name = 'Content'
 params.header = true
 weight = 2
 [[menu.main]]
-name = 'Articles'
+name = 'Tutorials'
 url = '/articles'
 weight = 3
 [[menu.main]]
 name = 'Other'
 params.header = true
 weight = 4
-[[menu.main]]
-name = 'Stack'
-url = '/stack'
-weight = 5
+# [[menu.main]]
+# name = 'Stack'
+# url = '/stack'
+# weight = 5
 [[menu.main]]
 name = 'Links'
 url = '/links'
@@ -53,7 +53,7 @@ name = 'About me'
 params.header = true
 weight = 7
 [[menu.main]]
-name = 'Portfolio'
+name = 'My Articles'
 url = '/portfolio'
 weight = 8
 
@@ -66,7 +66,7 @@ name = 'LinkedIn'
 url = 'https://linkedin.com'
 weight = 2
 [[menu.social]]
-name = 'Medium'
+name = 'Dribbble'
 url = 'https://chadydimachkie.medium.com/'
 weight = 3
 [[menu.social]]

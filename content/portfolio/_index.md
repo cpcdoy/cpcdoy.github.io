@@ -1,4 +1,4 @@
 ---
-title: Portfolio (demo)
-description: User Experience built for you
+title: Articles
+description: A few articles by me I hope you'll enjoy
 ---

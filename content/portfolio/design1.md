@@ -1,15 +1,8 @@
 ---
-title: Pastry jelly cookie sugar donut orange
-date: 2021-12-18
+title: Cross-Entropy is All You Need… Or is It?
+date: 2023-7-10
 images:
-- https://picsum.photos/id/25/400/300
-description: Sprinkles jelly ipsum sweet biscuit marzipan. Jelly dolor biscuit croissant croissant sweet.
+- https://miro.medium.com/v2/resize:fit:1400/format:webp/1*s2Om6UM1M1XJ3z6yYb4VUQ.jpeg
+description: I introduce a new loss function “Smooth Generalized Cross-Entropy”.
+link: https://medium.com/ntropy-network/is-cross-entropy-all-you-need-lets-discuss-an-alternative-ac0df6ff5691
 ---
-
-Croissant orange croissant dolor orange croissant. Lollipop biscuit donut vanilla sweet croissant. Apple donut candy tiramisu cream jelly. Croissant sweet cookie vanilla tiramisu dolor.
-
-Pastry jelly cookie sugar donut orange. Candy sweet cookie sweet donut marzipan. Vanilla cookie sprinkles pastry orange cookie. Marzipan donut ipsum sugar biscuit vanilla. 
-
-Candy cookie muffin pastry lollipop vanilla. Apple orange tiramisu jelly ipsum sugar. Candy cake orange ipsum orange muffin. Sugar pastry orange cream orange pastry. 
-
-Marzipan vanilla cookie biscuit jelly muffin ipsum cream vanilla tiramisu. Marzipan vanilla sweet tiramisu pastry cake jelly jelly pastry cake. Cookie sweet donut candy pastry apple dolor orange lollipop biscuit. Muffin cream ipsum ipsum sprinkles sugar tiramisu pastry sweet tiramisu. 

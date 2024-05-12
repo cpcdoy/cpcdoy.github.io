@@ -1,15 +1,8 @@
 ---
-title: Cream sugar apple donut apple croissant
-date: 2021-12-17
+title: "Efficiency and Maintainability in Named Entity Recognition: A Trie-based Knowledge Base Approach"
+date: 2023-5-19
 images:
-- https://picsum.photos/id/30/400/300
-description: Cookie sweet donut candy pastry apple dolor orange lollipop biscuit. Muffin cream ipsum ipsum sprinkles sugar tiramisu pastry sweet tiramisu. 
+- https://miro.medium.com/v2/resize:fit:1400/format:webp/1*o7tzIBQTzMKyoOIDAPtI-g.jpeg
+description: I introduce a new method called "Knowledge Base NER (KB-NER)".
+link: https://medium.com/ntropy-network/efficiency-and-maintainability-in-named-entity-recognition-a-trie-based-knowledge-base-approach-6c042c1ccdd
 ---
-
-Tiramisu sprinkles marzipan lollipop marzipan dolor. Jelly candy marzipan vanilla candy ipsum. Sugar croissant lollipop vanilla cream marzipan. Sprinkles croissant cream dolor jelly marzipan. 
-
-Pastry jelly cookie sugar donut orange. Candy sweet cookie sweet donut marzipan. Vanilla cookie sprinkles pastry orange cookie. Marzipan donut ipsum sugar biscuit vanilla. 
-
-Candy cookie muffin pastry lollipop vanilla. Apple orange tiramisu jelly ipsum sugar. Candy cake orange ipsum orange muffin. Sugar pastry orange cream orange pastry. 
-
-Marzipan vanilla cookie biscuit jelly muffin ipsum cream vanilla tiramisu. Marzipan vanilla sweet tiramisu pastry cake jelly jelly pastry cake. Cookie sweet donut candy pastry apple dolor orange lollipop biscuit. Muffin cream ipsum ipsum sprinkles sugar tiramisu pastry sweet tiramisu. 
