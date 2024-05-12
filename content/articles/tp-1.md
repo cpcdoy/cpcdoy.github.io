@@ -17,12 +17,18 @@ It's recommended to use a Jupyter notebook since you'll be doing some visualizat
 You should have `Jupyter` installed and the following dependencies. You can use `pip` or any other dependency manager:
 
 ```sh
-pip install torch matplotlib
+pip install torch matplotlib scikit-learn
 ```
 
 ## In The Cloud *(Google Colab)*
 
 Simply click [here to open a Colab notebook](https://colab.research.google.com/) in your browser. You'll need to sign-in with you Google account.
+
+In the first cell, add this following to install the dependencies:
+
+```sh
+!pip install torch matplotlib scikit-learn
+```
 
 # Let's Get Started
 
@@ -181,7 +187,7 @@ It's very probable that we'll miss the most optimal solution when navigating in 
 
 To navigate this landscape we'll use what's called an *optimizer*. The optimizer will follow what the derivates of the loss function at a specific time step $t$ is telling us and will take the best guess as to where to go given this information.
 
-Most neural network optimizers are based on *Gradient Descen (GD)*. This algorithm looks like this:
+Most neural network optimizers are based on *Gradient Descent (GD)*. This algorithm looks like this:
 
 $W_{i+1} = W_i - lr * D_{loss}(W_i, X_{train}, y_{train})$, where $W_i$ are the current weights of the model, $D_{loss}$ is the loss function's derivative that takes as input the current model weights $W_i$ to compute predictions on the training set $X_{train}$ and compare the model output (which we called $\hat{y}$ earlier) to the ground truth labels $y$.
 
@@ -242,10 +248,6 @@ for t in range(num_steps):
 And that's it!
 
 No formulas are needed on our end, PyTorch computes everything internally.
-
-<exercisequote>
-How would you test that the neural network we just trained actually works? And how are accuracy metrics different from the loss function?
-</exercisequote>
 
 #### Let's look into what's happening
 
@@ -330,8 +332,79 @@ It fits our more complex dataset much better!
 How do I determine the correct number of steps needed to converge? How do I decide the correct learning rate?
 </questionquote>
 
-# Send it to me!
+### Teaching Another Task to Our Neural Network: Classification
+
+We've been doing regression so far, meaning we've only been trying to match a dataset's shape. Let's now move onto classification which is a way to separate different categories within a dataset.
+
+For that, let's make yet another dataset:
+
+```Python
+from sklearn.datasets import make_blobs
+
+def create_dataset(n_samples = 200, n_features = 2, n_classes = 2, cluster_std=0.7):
+    X, y = make_blobs(n_samples=n_samples, cluster_std=cluster_std, centers=n_classes, n_features=n_features, random_state=0)
+    
+    return torch.from_numpy(X).float(), torch.from_numpy(y).long()
+```
+
+This time we're using `make_blobs` from `scikit-learn` that enables us to generate what they call "blobs", which are just several groups (or clusters) of data points. Let's display it:
+
+```Python
+n_samples = 100
+n_features = 2
+n_classes = 4
+
+x, y = create_dataset(n_samples=n_samples, n_features=n_features, n_classes=n_classes)
+
+plt.scatter(x.numpy()[:, 0], x.numpy()[:, 1], c=y.numpy(), s=100, lw=0, cmap='RdYlGn')
+plt.show()
+```
+
+![multi_class_dataset](/images/multi_class_dataset.png)
+
+Let's reuse the exact same neural network architecture as earlier and only the number of features and the numbers of outputs:
+
+```Python
+net = Net(n_feature=n_features, n_hidden=10, n_output=n_classes)
+```
+
+We'll also change the loss function since we are now doing classification instead of regression:
+
+```Python
+loss_func = torch.nn.CrossEntropyLoss()
+```
+
+This is what the Cross-Entropy loss looks like: $-\sum_{i=0}^Ly_i\log(p_i)$ where $p_i$ is the prediction from our model and $y_i$ is respective ground truth label.
+
+In the case of 2 classes only, the loss can be simplified to this: $-{(y\log(p) + (1 - y)\log(1 - p))}$
+
+If you want more details on Cross-Entropy, you can read more [here](https://machinelearningmastery.com/cross-entropy-for-machine-learning/).
+
+Ok, now let's run the training with the above changes:
+
+<video width="512" height="512" controls>
+  <source src="/videos/multi_class_classification.mp4" type="video/mp4">
+Your browser does not support MP4 videos somehow...
+</video>
+
+<exercisequote>
+How would you evaluate that the neural network we just trained actually works?
+</exercisequote>
+
+<questionquote>
+How are accuracy metrics different from the loss function?
+</questionquote>
+
+<exercisequote>
+Plot the 3D loss landscape of the model.
+</exercisequote>
+
+# Transfer Learning
+
+# Bring Your Own Dataset!
+
+In this section you'll use 
 
 Send it to my [email adress](mailto:chady1.dimachkie@epita.fr?subject=TP%201) with the subject **Practical Work 1**: [chady1.dimachkie@epita.fr](mailto:chady1.dimachkie@epita.fr?subject=Practical%20Work%201)
 
-→ [TP 2](/articles/structure)
+→ [Coming Next: TP 2](/articles/)
