@@ -399,12 +399,52 @@ How are accuracy metrics different from the loss function?
 Plot the 3D loss landscape of the model.
 </exercisequote>
 
-# Transfer Learning
-
 # Bring Your Own Dataset!
 
-In this section you'll use 
+We've only been working on simple datasets so far, let's make it more interesting and work on something more useful.
+
+Please pick one of the following datasets to work on:
+
+- [Iris plants dataset (Classification)](https://scikit-learn.org/stable/datasets/toy_dataset.html#iris-plants-dataset)
+- [Diabetes dataset (Regression)](https://scikit-learn.org/stable/datasets/toy_dataset.html#diabetes-dataset)
+- [Linnerrud dataset (Regression)](https://scikit-learn.org/stable/datasets/toy_dataset.html#linnerrud-dataset)
+- [Wine recognition dataset (Classification)](https://scikit-learn.org/stable/datasets/toy_dataset.html#wine-recognition-dataset)
+- [Breast cancer wisconsin (diagnostic) dataset (Classification)](https://scikit-learn.org/stable/datasets/toy_dataset.html#wine-recognition-dataset)
+- [Optical recognition of handwritten digits dataset (Classification)](https://scikit-learn.org/stable/datasets/toy_dataset.html#optical-recognition-of-handwritten-digits-dataset)
+
+Each one of these datasets is easily downloadable using `scikit-learn`. You'll find the loading functions [here](https://scikit-learn.org/stable/datasets/toy_dataset.html#toy-datasets).
+
+## Tips to Get Started
+
+### Study the Dataset
+
+Do a quick EDA (Exploratory Data Analysis) on your dataset. This is critical to understand the structure, contents, and relationships within the data:
+
+- Look at the shape (rows, columns, etc) of your dataset
+- Look at the data manually first to get a feel of what it looks like and what kind of data it is
+- Generate a few statistics on the dataset, like mean, median, range, etc for each column
+
+There are many other steps you can add, but here let's keep it simple, we just want to understand how much input features are needed and how many outputs the model will have.
+
+### Normalize The Values
+
+Apply simple normalization to your dataset like centering values around 0 (substracting the mean of the data to each value) and scaling the standard deviation to 1 (dividing each value by the standard deviation).
+
+Using `scikit-learn` you can do it very simply using [`StandardScaler`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) for example.
+
+### Split into a Train/Test Set
+
+If you dataset doesn't already provide a test/validation set, you'll have to do it manually.
+This is standard practice since you want to make sure you evaluate your model on data it hasn't seen before to see if it generalized correctly from the train set you gave it. Ideally, if you have enough data, making a validation set is also a good practice, since it helps you test on some data the model hasn't seen to track performance progress during training.
+
+Using `scikit-learn` again you can do it very simply using the [`train_test_split`](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html) function.
+
+# You're Done!
+
+Great job, you made it this far!
 
 Send it to my [email adress](mailto:chady1.dimachkie@epita.fr?subject=TP%201) with the subject **Practical Work 1**: [chady1.dimachkie@epita.fr](mailto:chady1.dimachkie@epita.fr?subject=Practical%20Work%201)
+
+**Don't hesitate if you have any questions!**
 
 → [Coming Next: TP 2](/articles/)
