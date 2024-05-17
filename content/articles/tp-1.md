@@ -1,10 +1,9 @@
 ---
 title: 1. Build a Neural Network in PyTorch
-date: 2024-03-06
+date: 2024-05-17
 images: 
 - https://cs231n.github.io/assets/nn1/neural_net.jpeg
 ---
-
 
 In this first practical work, we'll be experimenting with simple neural networks on simple datasets.
 
@@ -20,6 +19,8 @@ You should have `Jupyter` installed and the following dependencies. You can use 
 pip install torch matplotlib scikit-learn
 ```
 
+You can add more dependencies if you think it is relevant.
+
 ## In The Cloud *(Google Colab)*
 
 Simply click [here to open a Colab notebook](https://colab.research.google.com/) in your browser. You'll need to sign-in with you Google account.
@@ -29,6 +30,8 @@ In the first cell, add this following to install the dependencies:
 ```sh
 !pip install torch matplotlib scikit-learn
 ```
+
+Same here, you can add more dependencies if you think it is relevant.
 
 # Let's Get Started
 
@@ -173,11 +176,11 @@ There are many more [loss functions](https://pytorch.org/docs/stable/nn.html#los
 Take a look at this mountain looking picture:
 
 ![loss_landscape](/loss_landscape.jpeg)
-*<center><small>Example of a loss landscape.</small></center>*
+*<center><small>Example of a loss landscape. (Each points here are all possible models we could end up with after training and the color/height in this graph shows its performance on the task) </small></center>*
 
 This is basically a representation of the loss values around the weight space of the network: What this means is that for each possible weights our networks can have (it's a very large number so we usually only ever explore a few like what you see on the image), we can plot how it performs thanks to the loss function.
 
-The <span style="color: blue">lower</span> we are in the landscape, the closer we get to a good solution. Furthermore, you can see that we start from a **point** quite <span style="color: red">high</span> in the lanscape (the initialization of network which we hope is good enough) and then we <span style="color: green">explore by following the gradients</span> of what the loss is telling us until we reach a <span style="color: blue">good enough weight set</span> where our model performs well.
+The <span style="color: blue">lower</span> we are in the landscape, the closer we get to a good solution. Furthermore, you can see that we start from a **point** quite <span style="color: red">high</span> in the lanscape (the pseudo-random initialization of the network which we hope is good enough) and then, using an optimizer, we <span style="color: green">explore by following the gradients</span> of what the loss is telling us until we reach a <span style="color: blue">good enough weight set</span> where our model performs well.
 
 <notequote>
 It's very probable that we'll miss the most optimal solution when navigating in the loss landscape. In practice, we'll find there are many quasi-optimal solutions that exist that are sufficient.
@@ -395,6 +398,8 @@ How would you evaluate that the neural network we just trained actually works?
 How are accuracy metrics different from the loss function?
 </questionquote>
 
+#### Bonus
+
 <exercisequote>
 Plot the 3D loss landscape of the model.
 </exercisequote>
@@ -414,6 +419,10 @@ Please pick one of the following datasets to work on:
 
 Each one of these datasets is easily downloadable using `scikit-learn`. You'll find the loading functions [here](https://scikit-learn.org/stable/datasets/toy_dataset.html#toy-datasets).
 
+<exercisequote>
+Train the best model on the task of your choice. Don't forget to read the tips below.
+</exercisequote>
+
 ## Tips to Get Started
 
 ### Study the Dataset
@@ -424,20 +433,47 @@ Do a quick EDA (Exploratory Data Analysis) on your dataset. This is critical to 
 - Look at the data manually first to get a feel of what it looks like and what kind of data it is
 - Generate a few statistics on the dataset, like mean, median, range, etc for each column
 
-There are many other steps you can add, but here let's keep it simple, we just want to understand how much input features are needed and how many outputs the model will have.
+There are many other steps you can add, but here let's keep it simple, we just want to understand how much input features are needed and how many outputs the model will have and what the data looks like in general.
 
 ### Normalize The Values
 
-Apply simple normalization to your dataset like centering values around 0 (substracting the mean of the data to each value) and scaling the standard deviation to 1 (dividing each value by the standard deviation).
+Apply simple normalization to your dataset like centering values around $0$ (substracting the mean of the data to each value) and scaling the standard deviation to $1$ (dividing each value by the standard deviation).
 
-Using `scikit-learn` you can do it very simply using [`StandardScaler`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) for example.
+Using `scikit-learn` you can do it very simply using [StandardScaler](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) for example.
 
 ### Split into a Train/Test Set
 
 If you dataset doesn't already provide a test/validation set, you'll have to do it manually.
 This is standard practice since you want to make sure you evaluate your model on data it hasn't seen before to see if it generalized correctly from the train set you gave it. Ideally, if you have enough data, making a validation set is also a good practice, since it helps you test on some data the model hasn't seen to track performance progress during training.
 
-Using `scikit-learn` again you can do it very simply using the [`train_test_split`](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html) function.
+Using `scikit-learn` again you can do it very simply using the [train_test_split](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html) function.
+
+### Accuracy Metrics
+
+Make sure your metrics are adapted to your task.
+
+#### For Classification
+
+For classification tasks, look into metrics such as `F1 Score`, `precision`, `recall`, `accuracy`. You can even plot a `confusion matrix`. All these metrics can be found in `scikit-learn`.
+
+Also, you can look at the loss value for both `train` and `test` data.
+
+#### Regression
+
+For regression tasks, look into metrics such as `Mean Absolute Error (MAE)`, `Mean Squared Error (MSE)`, `Root Mean Squared Error (RMSE)` and `R-squared (R²) Score`. Again, they can all be found in `scikit-learn`.
+
+### Refine Your Model
+
+If your model doesn't perform well, it might be due to:
+  - Not having pre-processed the data correctly (normalization, cleaning values, etc)
+  - Not having the right architecture for the problem, maybe you have a lot of data and you need a bigger model (more layers or bigger hidden layers)
+  - Your learning rate and your optimizer that aren't correctly set
+
+### Bonus
+
+<exercisequote>
+Perform hyperparameter search to find the best learning rate, model size, or any other parameter you find relevant.
+</exercisequote>
 
 # You're Done!
 
@@ -447,4 +483,4 @@ Send it to my [email adress](mailto:chady1.dimachkie@epita.fr?subject=TP%201) wi
 
 **Don't hesitate if you have any questions!**
 
-→ [Coming Next: TP 2](/articles/)
+→ [Coming Next: Practical Work 2](/articles/)

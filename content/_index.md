@@ -4,11 +4,9 @@ title: Homepage
 
 # Hello 👋
 
-**Welcome to the Deep Learning Course!**
+**Welcome to the EPITA Deep Learning Course!**
 
 You'll find tutorials and practical work in the [Articles](/articles) section.
-
-If you need some 
 
 <!-- 
 <script src="https://static.elfsight.com/platform/platform.js" data-use-service-core defer></script>
