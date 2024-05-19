@@ -7,7 +7,7 @@ images:
 
 In this first practical work, we'll be experimenting with simple neural networks on simple datasets.
 
-# Get Setup
+# First, Get Setup
 
 It's recommended to use a Jupyter notebook since you'll be doing some visualization.
 
@@ -483,4 +483,4 @@ Send it to my [email adress](mailto:chady1.dimachkie@epita.fr?subject=TP%201) wi
 
 **Don't hesitate if you have any questions!**
 
-→ [Coming Next: Practical Work 2](/articles/)
+→ [Coming Next: Practical Work 2](/articles/tp-2)
