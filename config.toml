@@ -71,7 +71,7 @@ url = 'https://chadydimachkie.medium.com/'
 weight = 3
 [[menu.social]]
 name = 'Email'
-url = 'mailto:user@example.org'
+url = 'mailto:chady.dimachkie@gmail.com'
 weight = 4
 
 
