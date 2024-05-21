@@ -1,6 +1,6 @@
 ---
 title: 2. Intro to Convolutional Neural Networks (CNNs) in PyTorch
-date: 2024-05-19
+date: 2024-05-24
 images: 
 - /images/tp-2/cnn_tp_cover.webp
 ---
@@ -135,130 +135,7 @@ To learn more about these and how to correctly compute your kernel size for a sp
 
 ## Let's build a CNN in PyTorch
 
-```Python
-import torch
-import torch.nn as nn
-from torch.autograd import Variable
-import torch.utils.data as Data
-import torchvision
-import matplotlib.pyplot as plt
-
-# Mnist digits dataset
-train_data = torchvision.datasets.MNIST(
-    root='./mnist/',
-    train=True,                                     # this is training data
-    transform=torchvision.transforms.ToTensor(),    # Converts a PIL.Image or numpy.ndarray to
-                                                    # torch.FloatTensor of shape (C x H x W) and normalizes it in the range [0.0, 1.0]
-    download=True,                                  # Download the dataset if you don't already have it
-)
-```
-
----
-
-
-Now that we have recalled how CNNs work, it's time to actually build one with PyTorch. Next, you will see a full example of a simple Convolutional Neural Network. From beginning to end, you will see that the following happens:
-
-1. **The imports**. First of all, we're importing all the dependencies that are necessary for this example. For loading the dataset, which is `MNIST`, we'll need the operating system functionalities provided by Python - i.e., `os`. We'll also need PyTorch (`torch`) and its neural networks library (`nn`). Using the `DataLoader` we can load the dataset, which we can transform into Tensor format with `transforms` - as we will see later.
-2. **The neural network Module definition.** In Pytorch, neural networks are constructed as `nn.Module` instances - or neural network modules. In this case, we specify a `class` called `ConvNet`, which extends the `nn.Module` class. In its constructor, we pass some data to the super class, and define a `Sequential` set of layers. This set of layers means that a variety of neural network layers is stacked on top of each other.
-3. **The layers**. Recall from the image above that the first layers are Convolutional in nature, followed by MLP layers. For two-dimensional inputs, such as images, Convolutional layers are represented in PyTorch as `nn.Conv2d`. Recall that all layers require an activation function, and in this case we use Rectified Linear Unit (`ReLU`). The multidimensional output of the final Conv layer is flattened into one-dimensional inputs for the MLP layers, which are represented by `Linear` layers.
-4. **Layer inputs and outputs.** All Python layers represent the number of _in\_channels_ and the number of _out\_channels_ in their first two arguments, if applicable. For our example, this means that:
-    - The first `Conv2d` layer has one input channel (which makes sence, since MNIST data is grayscale and hence has one input channel) and provides ten output channels.
-    - The second `Conv2d` layer takes these ten output channels and outputs five.
-    - As the MNIST dataset has 28 x 28 pixel images, two `Conv2d` layers with a kernel size of 3 produce feature maps of 24 x 24 pixels each. This is why after flattening, our number of inputs will be `24 * 24 * 5` - 24 x 24 pixels with 5 channels from the Conv layer. 64 outputs are specified.
-    - The next Linear layer has 64 inputs and 32 outputs.
-    - Finally, the 32 inputs are converted into 10 outputs. This also makes sence, since MNIST has ten classes (the numbers 0 to 9). Our loss function will be able to handle this format.
-5. **Forward definition**. In the `forward` def, the forward pass of the data through the network is performed.
-6. **The operational aspects**. Under the `main` check, the random seed is fixed, the data is loaded and preprocessed, the ConvNet, loss function and optimizer are initialized and the training loop is performed. In the training loop, batches of data are passed through the network, after the loss is computed and the error is backpropagated, after which the network weights are adapted during optimization.
-
-```python
-import os
-import torch
-from torch import nn
-from torchvision.datasets import MNIST
-from torch.utils.data import DataLoader
-from torchvision import transforms
-
-class ConvNet(nn.Module):
-  '''
-    Simple Convolutional Neural Network
-  '''
-  def __init__(self):
-    super().__init__()
-    self.layers = nn.Sequential(
-      nn.Conv2d(1, 10, kernel_size=3),
-      nn.ReLU(),
-      nn.Conv2d(10, 5, kernel_size=3),
-      nn.ReLU(),
-      nn.Flatten(),
-      nn.Linear(24 * 24 * 5, 64),
-      nn.ReLU(),
-      nn.Linear(64, 32),
-      nn.ReLU(),
-      nn.Linear(32, 10)
-    )
-
-
-  def forward(self, x):`
-    '''Forward pass'''
-    return self.layers(x)
-  
-  
-if __name__ == '__main__':
-  
-  # Set fixed random number seed
-  torch.manual_seed(42)
-  
-  # Prepare CIFAR-10 dataset
-  dataset = MNIST(os.getcwd(), download=True, transform=transforms.ToTensor())
-  trainloader = torch.utils.data.DataLoader(dataset, batch_size=10, shuffle=True, num_workers=1)
-  
-  # Initialize the ConvNet
-  convnet = ConvNet()
-  
-  # Define the loss function and optimizer
-  loss_function = nn.CrossEntropyLoss()
-  optimizer = torch.optim.Adam(convnet.parameters(), lr=1e-4)
-  
-  # Run the training loop
-  for epoch in range(0, 5): # 5 epochs at maximum
-    
-    # Print epoch
-    print(f'Starting epoch {epoch+1}')
-    
-    # Set current loss value
-    current_loss = 0.0
-    
-    # Iterate over the DataLoader for training data
-    for i, data in enumerate(trainloader, 0):
-      
-      # Get inputs
-      inputs, targets = data
-      
-      # Zero the gradients
-      optimizer.zero_grad()
-      
-      # Perform forward pass
-      outputs = convnet(inputs)
-      
-      # Compute loss
-      loss = loss_function(outputs, targets)
-      
-      # Perform backward pass
-      loss.backward()
-      
-      # Perform optimization
-      optimizer.step()
-      
-      # Print statistics
-      current_loss += loss.item()
-      if i % 500 == 499:
-          print('Loss after mini-batch %5d: %.3f' %
-                (i + 1, current_loss / 500))
-          current_loss = 0.0
-
-  # Process is complete.
-  print('Training process has finished.')
-```
+WIP
 
 Now that we understand the basics, let's move to something more interesting.
 
@@ -349,6 +226,8 @@ From this, we can conclude that the Pixel Shuffle formula works for any resoluti
 
 PyTorch fortunately defines [Pixel Shuffle](https://pytorch.org/docs/stable/generated/torch.nn.PixelShuffle.html) as a very simple layer for us that we can just plug into our network.
 
+## Train Your Model!
+
 <exercisequote>
 Plug the network architecture you made above into the code repository that trains a super-resolution model.
 </exercisequote>
@@ -361,6 +240,8 @@ You should get a network that'll create higher resolution image such as this:
 </figure></center>
 
 *<center><small>Left: Low resolution image we give our CNN. Right: The output of the SuperRes CNN</small></center>*
+
+## Last Exercise: DIY Pixel Shuffle!
 
 <exercisequote>
 Using the `einops` library which uses an Einstein-inspired notation, rewrite Pixel Shuffle from scratch using the `rearrange` operation. Then retrain the model and check that you have the exact same results as before.
