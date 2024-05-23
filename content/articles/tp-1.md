@@ -23,9 +23,9 @@ You can add more dependencies if you think it is relevant.
 
 ## In The Cloud *(Google Colab)*
 
-Simply click [here to open a Colab notebook](https://colab.research.google.com/) in your browser. You'll need to sign-in with you Google account.
+Simply [click here to open a Colab notebook](https://colab.research.google.com/) in your browser. You'll need to sign-in with you Google account.
 
-In the first cell, add this following to install the dependencies:
+In the first cell, add the following to install the dependencies:
 
 ```sh
 !pip install torch matplotlib scikit-learn
