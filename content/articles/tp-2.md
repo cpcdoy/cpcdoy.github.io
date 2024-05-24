@@ -55,7 +55,7 @@ Imagine trying to identify a cat in a photo. An MLP might struggle because it do
 ![cnn_filters](/images/tp-2/Visualization-of-example-features-of-eight-layers-of-a-deep-convolutional-neural.jpg)
 *<center><small>Visualization of the weights/activations of several layers of a CNN which naturally form a hierarchy of filters that look like parts of the images it's analyzing! Source: Understanding Neural Networks Through Deep Visualization</small></center>*
 
-In other words, CNNs have a built-in advantage: they are designed to tackle tasks where it's helpful to look at parts of an image (or a signal in general) and then combine those parts to understand the whole picture. This gives them a head start when learning the best weights during training because they are naturally better at processing image data than MLPs which have to figure out everything from scratch. In theory, you could train an MLP to behave like a CNN, but it would have to learn the convolution process first, putting it at a disadvantage in terms of learning speed. However, it works both ways, this bias towards convolution might not be the optimal solution for image tasks, and we're always looking for better methods. *Spoiler alert: Nowadays, we also use [transformers](https://arxiv.org/abs/2010.11929) and actually even [MLPs](https://arxiv.org/abs/2105.01601) made a comeback for image tasks!*
+In other words, CNNs have a built-in advantage: they are designed to tackle tasks where it's helpful to look at parts of an image (or a signal in general) and then combine those parts to understand the whole picture. This gives them a head start when learning the best weights during training because they are naturally better at processing image data than MLPs which have to figure out everything from scratch. However, it works both ways, this bias towards convolution might not be the optimal solution for image tasks, and we're always looking for better methods. *Spoiler alert: Nowadays, we also use [transformers](https://arxiv.org/abs/2010.11929) and actually even [MLPs](https://arxiv.org/abs/2105.01601) made a comeback for image tasks!*
 
 ### A CNN/ConvNet's Architecture
 
@@ -158,7 +158,7 @@ train_data = torchvision.datasets.MNIST(
 Here's what a digit looks like:
 ![mnist_example](/images/tp-2/mnist_example.png)
 
-Now, the dataset contains 60k digits, so it's going to be hard for us to train the model directly in one batch because it might not fit in our GPU's memory, so let's train the model by making several passes of gradient descent by using mini-batches. We call this method [mini-batch gradient descent](https://machinelearningmastery.com/gentle-introduction-mini-batch-gradient-descent-configure-batch-size/):
+Now, the dataset contains 60k digits, so it's going to be hard for us to train the model directly with the entire dataset in one batch because it might not fit in our GPU's memory, so let's train the model by making several passes of gradient descent by using mini-batches. We call this method [mini-batch gradient descent](https://machinelearningmastery.com/gentle-introduction-mini-batch-gradient-descent-configure-batch-size/):
 
 ```Python
 # The number of images our DataLoader should return per batch
@@ -178,30 +178,30 @@ Now, let's design the model architecture:
 class CNN(nn.Module):
     def __init__(self):
         super(CNN, self).__init__()
-        self.conv1 = nn.Sequential(         # input shape (1, 28, 28)
+        self.conv1 = nn.Sequential(         # Input shape (1, 28, 28)
             nn.Conv2d(
-                in_channels=1,              # input height
-                out_channels=16,            # n_filters
-                kernel_size=5,              # filter size
-                stride=1,                   # filter movement/step
-                padding=2,                  # if want same width and length of this image after con2d, padding=(kernel_size-1)/2 if stride=1
-            ),                              # output shape (16, 28, 28)
-            nn.ReLU(),                      # activation
-            nn.MaxPool2d(kernel_size=2),    # choose max value in 2x2 area, output shape (16, 14, 14)
+                in_channels=1,              # Dnput depth/channels
+                out_channels=16,            # Number of filters
+                kernel_size=5,              # Filter size
+                stride=1,                   # Filter movement/step
+                padding=2,                  # If we want the same width and height of this image after conv2d, padding=(kernel_size-1)/2 if stride=1
+            ),                              # Output shape (16, 28, 28)
+            nn.ReLU(),                      # Activation
+            nn.MaxPool2d(kernel_size=2),    # Choose max value in 2x2 area, output shape (16, 14, 14)
         )
-        self.conv2 = nn.Sequential(         # input shape (1, 28, 28)
-            nn.Conv2d(16, 32, 5, 1, 2),     # output shape (32, 14, 14)
-            nn.ReLU(),                      # activation
-            nn.MaxPool2d(2),                # output shape (32, 7, 7)
+        self.conv2 = nn.Sequential(         # Input shape (1, 28, 28)
+            nn.Conv2d(16, 32, 5, 1, 2),     # Output shape (32, 14, 14)
+            nn.ReLU(),                      # Activation
+            nn.MaxPool2d(2),                # Output shape (32, 7, 7)
         )
-        self.out = nn.Linear(32 * 7 * 7, 10)   # fully connected layer, output 10 classes
+        self.out = nn.Linear(32 * 7 * 7, 10)   # Linear layer, output 10 classes
 
     def forward(self, x):
-        x = self.conv1(x)
-        x = self.conv2(x)
-        x = x.view(x.size(0), -1)           # flatten the output of conv2 to (batch_size, 32 * 7 * 7)
+        x = self.conv1(x)                   # Apply the first sequential block
+        x = self.conv2(x)                   # Apply the second sequential block
+        x = x.view(x.size(0), -1)           # Flatten the output of conv2d to (batch_size, 32 * 7 * 7)
         output = self.out(x)
-        return output, x    # return x for visualization
+        return output, x    # Return x for visualization
 ```
 
 Let's visualize the above model:
@@ -211,16 +211,16 @@ Let's visualize the above model:
 Let's understand the flow and the architecture:
   - **1 input**: A batch ($bs=64$) of binarized $28*28$ images, meaning $1$ channel per image
   - **2 Sequential blocks**: Each block is composed of 3 operations
-    - **Conv2d**: A 2d convolution operation that will create filters that will activate on features on the image and feature maps
+    - **Conv2d**: A 2d convolution operation that will create filters that will activate on features on the image and subsequent feature maps
     - **ReLU**: A non-linear activation function as usual
-    - **MaxPool2d**: Max Pooling is an operation of dimensionality reduction. It basically reduces the feature map's size by a factor $f^2$ by looking at blocks of size $f × f$ and taking the max value of each block. This has several benefits:
+    - **MaxPool2d**: Max Pooling is an operation of dimensionality reduction. It basically reduces the feature map's size by a factor $f$ by looking at blocks of size $f × f$ and taking the max value of each block. This has several benefits:
       - Compression: Looking at every little detail in the image/feature map forces the model to overfit by remembering too much information. This operation forces the network to work with reduced dimensions in the next layer so it has to focus on more global features to be able to store features with less parameters. Using less parameters in subsequent layers also helps the model use less compute power.
       - Helps the model focus on important features: By only taking the values that activated most, Max Pooling forces the model to focus on important features like edges, textures, etc, that truly distinguish an object from another.
-      - Helps a bit with Transformation invariance: Since we're focusing less on micro details, the model doesn't need to look for very specific details when looking for a feauture, it looks more for an approximation of this feature which helps if the feature has as slight transformation applied to it like translation, rotation, etc. However, it doesn't help as much if the transformation is significant, only more data or data augmentation helps here with CNNs.
-      - Read more [here](https://d2l.ai/chapter_convolutional-neural-networks/pooling.html).
-  - **1 reshape operation**: This operation just rearranges the values in the tensor, but why is this needed? In our case we eventually want to output a 1D vector of size $10$ that will contain the classification results for each number class from $0$ to $9$. We thus need to go from our multiple dimension feature maps to an even more compressed representation using a linear layer. So this operations just rearranges the tensor from 3D to 1D, the values stay the same, but shapes go from $(batch\_size, filters, feature\_map\_x, feature\_map\_y)$ to $(batch\_size, filters×feature\_map\_x × feature\_map\_y)$
+      - Helps a bit with *Transformation invariance*: Since we're focusing less on micro details, the model doesn't need to look for very specific details when looking for a feature, it looks more for an approximation of this feature which helps if the feature has as slight transformation applied to it like translation, rotation, etc. However, it doesn't help as much if the transformation is significant, only more data or data augmentation helps here with CNNs.
+      - For more details, read more [here](https://d2l.ai/chapter_convolutional-neural-networks/pooling.html).
+  - **1 reshape operation**: This operation just rearranges the values in the tensor, but why is this needed? In our case we eventually want to output a 1D vector of size $10$ that will contain the classification results for each number class from $0$ to $9$. We thus need to go from our multiple dimension feature maps to an even more compressed representation using a linear layer. So this operations just rearranges the tensor from 3D to 1D, the values stay the same, but shapes go from $(batch\\_size, filters, feature\\_map\\_x, feature\\_map\\_y)$ to $(batch\\_size, filters×feature\\_map\\_x × feature\\_map\\_y)$
   - **2 outputs**: In practice your neural network can have several possible outputs with different purposes, also called *heads*. They can be used to perform several tasks with the same *backbone* (base of the model before the output that learns useful features that can be reused across tasks).
-    - **Classification output**: This is classic, we just use a linear layer that will convert from the CNN's representation to the $10$ digit classes classification.
+    - **Classification output**: This is classic, we just use a linear layer that will convert from the CNN's representation to the $10$ digits classes classification.
     - **Last layer embedding output**: This output is only used a visualization/debug output, we basically get the last internal representation (embedding) inside of the network so we can plot it and understand how our model represents our data. We'll see how to do that below.
 
 ### Training the Model
@@ -235,14 +235,14 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 cnn = CNN().to(device)
 ```
 
-Then we instantiate the optimizer (`AdamW`) and loss function (`Cross Entropy`). We'll use a new optimizer this time just for the sake of showing you what are the best optimizers being used nowadays. `AdamW` is one of the optimizers which converges the fastest in most cases. It is a stochastic gradient descent method that is based on adaptive estimation of first-order and second-order moments with an added method to decay weights per the techniques discussed in the paper, '[Decoupled Weight Decay Regularization](https://arxiv.org/abs/1711.05101)' by Loshchilov, Hutter et al., 2019.:
+Then we instantiate the optimizer (`AdamW`) and loss function (`Cross Entropy`). We'll use a new optimizer this time just for the sake of showing you what are the best optimizers being used nowadays. `AdamW` is one of the optimizers which converges the fastest in most cases. It is a stochastic gradient descent method that is based on adaptive estimation of first-order (the mean) and second-order moments (the variance) with an added method to decay weights per the techniques discussed in the paper, '[Decoupled Weight Decay Regularization](https://arxiv.org/abs/1711.05101)' *by Loshchilov, Hutter et al., 2019.*:
 
 ```Python
 # The Learning Rate (LR)
 LR = 0.001
 
-optimizer = torch.optim.AdamW(cnn.parameters(), lr=LR)  # optimize all cnn parameters
-loss_func = nn.CrossEntropyLoss()                       # the target label is not one-hotted
+optimizer = torch.optim.AdamW(cnn.parameters(), lr=LR)  # We optimize all the parameters of the CNN
+loss_func = nn.CrossEntropyLoss()                       # The loss
 ```
 
 The difference here is that we use a `device` variable so we can ask PyTorch to train on GPU if we have one, which makes training much faster. Now let's train the model:
@@ -252,16 +252,16 @@ EPOCH = 1
 
 for epoch in range(EPOCH):
     for step, (b_x, b_y) in enumerate(train_loader):   # gives batch data, normalize x when iterate train_loader
-        b_x = b_x.to(device)  # batch x
-        b_y = b_y.to(device)  # batch y
+        b_x = b_x.to(device)  # Batch X: Image data that we move to our device
+        b_y = b_y.to(device)  # Batch Y: Label data that we move to our device
         
-        output = cnn(b_x)[0]            # cnn classification output, this is the first head of the network
+        output = cnn(b_x)[0]            # CNN's classification output, this is the first head of the network
         
-        loss = loss_func(output, b_y)   # cross entropy loss
+        loss = loss_func(output, b_y)   # The Cross-Entropy loss
         
-        optimizer.zero_grad()           # clear gradients for this training step
-        loss.backward()                 # backpropagation, compute gradients
-        optimizer.step()                # apply gradients
+        optimizer.zero_grad()           # We clear the gradients every training step
+        loss.backward()                 # Backpropagation and compute gradients
+        optimizer.step()                # Use the computed gradients to do gradient descent
 ```
 
 ### Let's Do Some Visualization
@@ -335,7 +335,7 @@ Now that we understand the basics, let's solve a more interesting task!
 
 Super resolution is the process of taking a low-resolution image and upscaling it to recover, or more accurately, extrapolate details at a higher resolution. The term "extrapolate" is used because the additional details do not actually exist in the original image. Unlike interpolation algorithms such as [bicubic](https://en.wikipedia.org/wiki/Bicubic_interpolation) or [Lanczos resampling](https://en.wikipedia.org/wiki/Lanczos_resampling), which do not require machine learning, super resolution uses advanced techniques to infer and generate these new details using neural networks.
 
-Let's not forget that even these "simpler" interpolation methods are quite good baselines that can be hard to beat, even production-ready methods such as [AMD Radeon™ Super Resolution](https://www.amd.com/en/products/software/adrenalin/radeon-super-resolution.html) for video game super-resolution use Lanczos at their core. However, methods such as [Nvidia DLSS](https://www.nvidia.com/en-us/geforce/technologies/dlss/) use deep learning and offer better results and performance in general *(shameless plug since I worked on DLSS v1 :D)*.
+Let's not forget that even these "simpler" interpolation methods are quite good baselines that can be hard to beat, even production-ready methods such as [AMD Radeon™ Super Resolution](https://www.amd.com/en/products/software/adrenalin/radeon-super-resolution.html) for video game super-resolution use Lanczos at their core. However, methods such as [Nvidia DLSS](https://www.nvidia.com/en-us/geforce/technologies/dlss/) use deep learning and offer better results and performance in general *(shameless plug since I worked on DLSS v1 😃)*.
 
 ![sr_example](/images/tp-2/sr_example.png)
 *<center><small>Left: Low Resolution (LR) Image. Right: Reconstructed High Resolution (HR) Image</small></center>*
@@ -347,9 +347,12 @@ The general idea is that we have a low resolution (LR) image and we want to get 
 ![srcnn_fig_2](/images/tp-2/srcnn_fig_2.png)
 *<center><small>Source: Image Super-Resolution Using Deep Convolutional Networks, Chao Dong et al, 2014</small></center>*
 
-To enhance a low-resolution image, the image is first upscaled to the desired super-resolution size using bicubic interpolation, resulting in an interpolated image $Y$. The aim is to recover an image $F(Y)$ from $Y$ that resembles the high-resolution image $X$ we want to obtain in terms of dimensions. Despite $Y$ having the same dimensions as $X$, it is still referred to as low-resolution.
+To enhance a low-resolution image, the image is first upscaled to the desired super-resolution size using bicubic interpolation, resulting in an interpolated image $Y$. The aim is to recover an image $F(Y)$ from $Y$ that resembles the high-resolution image $X$ we want to obtain in terms of dimensions. Despite the $Y$ having the same dimensions as $X$, it is still referred to as low-resolution.
 
-The process then involves three main operations: (1) Patch extraction and representation, where overlapping patches from $Y$ are extracted and represented as high-dimensional vectors to form feature maps. (2) Non-linear mapping, which transforms each high-dimensional vector into another high-dimensional vector representing high-resolution patches, forming a new set of feature maps. (3) Reconstruction, which combines these high-resolution patch representations to generate the final high-resolution image similar to $X$. These operations collectively form a convolutional neural network, as illustrated in the above figure.
+The process then involves three main operations:
+  1. Patch extraction and representation, where overlapping patches from $Y$ are extracted and represented as high-dimensional vectors to form feature maps.
+  2. Non-linear mapping, which transforms each high-dimensional vector into another high-dimensional vector representing high-resolution patches, forming a new set of feature maps.
+  3. Reconstruction, which combines these high-resolution patch representations to generate the final high-resolution image similar to $X$. These operations collectively form a convolutional neural network, as illustrated in the above figure.
 
 Now, something that isn't ideal with their approach is that they first upscale the image using bicubic interpolation to get the final shape they need to operate on. This really isn't optimal at all since it introduces a bias from the bicubic interpolation!
 
@@ -359,11 +362,7 @@ Let's improve their architecture step-by-step by going for an architecture that 
 
 ![model_svg|100x50](/images/tp-2/model.gv.svg)
 
-<exercisequote>
-Study and recreate the above architecture in PyTorch.
-</exercisequote>
-
-A few hints:
+A few things to notice here:
   - The input dimensions of the network $(1, 1, H, W)$ are $(batch\\_size, channels, height, width)$
   - Why is $channels = 1$?
   - What's the `PixelShuffle` operation?
@@ -375,9 +374,13 @@ Let's answer a few of these questions.
 
 Computer displays are driven by red ($R$), green ($G$), and blue ($B$) voltage signals. These signals are efficient in describing how color physically works. However, these RGB signals are not efficient to store since they have a lot of redundancy and usually we want to have the best compromise between size and quality.
 
-On top of that, and that's very important for us here, the human vision works in a specific way which was can use to our advantage: Due to the densities of color and brightness-sensitive receptors in the human eye, humans can see considerably more fine detail in the brightness of an image (the $Y$ component) than in the hue and color saturation of an image (the $Cb$ and $Cr$ components).
+On top of that, and that's very important for us here, the human vision works in a specific way which was can use to our advantage: Due to the densities of color and brightness-sensitive receptors in the human eye, humans can see considerably more fine detail in the brightness of an image (the $Y$ component) than in the hue and color saturation of an image (the $Cb$ and $Cr$ components). If you zoom in on the Cb and Cr componenets of the image below, you'll see that the details are indeed there but our eyes have a much harder time at seeing them.
 
-This property enables us to decorrelate "detail" from "color" information in YCbCr while RGB has luminance information spread out across $R$, $G$ and $B$. And as you know, the less correlation we have between features (or components in this case) in data, the more we can compress this data. JPEG actually uses YCbCr since it can help bette compress the final image.
+<img style="width:200px" src="/images/tp-2/ycbcr.jpg">
+
+*<center><small>Top: Original Image. Below, in order: YCbCr image with the Y channel being a grayscale copy of the original image, the Cb and Cr components</small></center>*
+
+This property enables us to decorrelate "detail" from "color" information in YCbCr while RGB has luminance information spread out across $R$, $G$ and $B$. And as you know, the less correlation we have between features (or components in this case) in data, the more we can compress this data. JPEG actually uses YCbCr since it can help better compress the final image.
 
 *Now, why would we need this inside a neural network?*
 
@@ -420,8 +423,10 @@ PyTorch fortunately defines [Pixel Shuffle](https://pytorch.org/docs/stable/gene
 ## Train Your Model!
 
 <exercisequote>
-Plug the network architecture you made above into the code repository that trains a super-resolution model.
+Study, recreate and plug the network architecture above into the code repository that trains a super-resolution model.
 </exercisequote>
+
+To get started with this task, you should go to the [Practical Work 2 GitHub repository here](https://github.com/cpcdoy/dl_practical_work/tree/main/practical_work_2_cnn). You'll need to plug your model in the `model.py` file, the rest (data loading, training, testing and running the model) is done for you so you don't have to think about it, but it's very similar to what you've already seen before.
 
 You should get a network that'll create higher resolution images such as this after training:
 
@@ -435,8 +440,10 @@ You should get a network that'll create higher resolution images such as this af
 ## Last Exercise: DIY Pixel Shuffle!
 
 <exercisequote>
-Using the `einops` library which uses an Einstein-inspired notation, rewrite Pixel Shuffle from scratch using the `rearrange` operation. Then retrain the model and check that you have the exact same results as before.
+Using the `einops` library which uses an Einstein-inspired notation, rewrite Pixel Shuffle from scratch. Finally, retrain the model and verify that your network still performs the same.
 </exercisequote>
+
+Read the documentation of `einops` [here](https://einops.rocks/1-einops-basics/).
 
 ---
 
