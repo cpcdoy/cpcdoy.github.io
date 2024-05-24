@@ -1,6 +1,6 @@
 ---
 title: 2. Intro to Convolutional Neural Networks (CNNs) in PyTorch
-date: 2024-05-22
+date: 2024-05-24
 images: 
 - /images/tp-2/cnn_tp_cover.webp
 ---
