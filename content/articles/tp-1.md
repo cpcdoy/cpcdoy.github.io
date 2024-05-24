@@ -7,7 +7,7 @@ images:
 
 In this first practical work, we'll be experimenting with simple neural networks on simple datasets.
 
-# Get Setup
+# First, Get Setup
 
 It's recommended to use a Jupyter notebook since you'll be doing some visualization.
 
@@ -23,9 +23,9 @@ You can add more dependencies if you think it is relevant.
 
 ## In The Cloud *(Google Colab)*
 
-Simply click [here to open a Colab notebook](https://colab.research.google.com/) in your browser. You'll need to sign-in with you Google account.
+Simply [click here to open a Colab notebook](https://colab.research.google.com/) in your browser. You'll need to sign-in with you Google account.
 
-In the first cell, add this following to install the dependencies:
+In the first cell, add the following to install the dependencies:
 
 ```sh
 !pip install torch matplotlib scikit-learn
@@ -483,4 +483,4 @@ Send it to my [email adress](mailto:chady1.dimachkie@epita.fr?subject=TP%201) wi
 
 **Don't hesitate if you have any questions!**
 
-→ [Coming Next: Practical Work 2](/articles/)
+→ [Coming Next: Practical Work 2](/articles/tp-2)

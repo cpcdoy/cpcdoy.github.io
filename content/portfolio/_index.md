@@ -1,4 +1,4 @@
 ---
 title: Articles
-description: A few articles by me I hope you'll enjoy
+description: A few of my articles
 ---
