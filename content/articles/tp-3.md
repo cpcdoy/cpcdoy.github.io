@@ -189,7 +189,6 @@ Ok, we went quite deep in the theory, but we're finally at the implementation ph
 
 
 
-
 ### $\beta$-Variance Schedule
 
 The $\beta_t$ linear schedule is actually quite strong because noise grows very rapidly and we even start having issues recognizing the original image with the naked eye.
@@ -198,11 +197,9 @@ The $\beta_t$ linear schedule is actually quite strong because noise grows very 
 Improve the current scheduling by implementing cosine scheduling as proposed above.
 </exercise>
 
-
 ### Something to Note
 
 Diffusion Models also exist under different forms mathematically speaking that all have different names (like Score-based generative models, SDE-based generative models, Langevin dynamics, etc) that people discovered at different times. To learn more, read [this](http://yang-song.net/blog/2021/score/).
-
 
 
 ---
@@ -210,6 +207,12 @@ Diffusion Models also exist under different forms mathematically speaking that a
 # You're Done!
 
 Great job, you made it this far!
+
+## Class Students
+
+Send it on the associated MS Teams Assignment.
+
+## Anyone else
 
 Send it to my [email adress](mailto:chady1.dimachkie@epita.fr?subject=TP%203) with the subject **Practical Work 3**: [chady1.dimachkie@epita.fr](mailto:chady1.dimachkie@epita.fr?subject=Practical%20Work%203)
 
