@@ -475,6 +475,8 @@ If your model doesn't perform well, it might be due to:
 Perform hyperparameter search to find the best learning rate, model size, or any other parameter you find relevant.
 </exercisequote>
 
+---
+
 # You're Done!
 
 Great job, you made it this far!
