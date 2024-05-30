@@ -5,7 +5,7 @@ images:
 - /images/tp-3/diffusion_model_arch.png
 ---
 
-In this third practical work, we'll be experimenting with Denoising Diffusion Probabilistic Models (DDPMs).
+In this third practical work, we'll be experimenting with **Denoising Diffusion Probabilistic Models (DDPMs)**.
 
 # As Usual, Get Setup
 
@@ -135,7 +135,7 @@ According to the paper it's all simple:
 
 ![loss_ddpm_1](/images/tp-3/loss_ddpm_1.png)
 
-But what's this "usual variational bound on negative log likelihood"? Basically, it's an observation that the forward $q$ and reverse $p_{\theta}$ processes can be seen as a Variational Auto-Encoder (VAE) (first described in the paper "Auto-Encoding Variational Bayes", [Kingma et al., 2013](https://www.google.com/url?q=https%3A%2F%2Farxiv.org%2Fabs%2F1312.6114) for more details). This formulation allows us to use the "Variational lower bound" which basically helps us approximate the log-likelihood of the train data using gradient-based methods by finding a lower bound to this log-likelihood. Basically, this tells us that $log(p_{\theta}(x_0)) \geq L$, where $L$ is the equation above from the paper. Meaning that if we maximize the negative of it $-log(p_{\theta}(x_0))$ through optimization then we'll find a solution to our problem. Why maximizing? Because it'll just bring us in the correct direction to our solution if we move to this bound that they found, even if it's not necessarily the actual maximum.
+But what's this "usual variational bound on negative log likelihood"? Basically, it's an observation that the forward $q$ and reverse $p_{\theta}$ processes can be seen as a Variational Auto-Encoder (VAE) (first described in the paper "Auto-Encoding Variational Bayes", [Kingma et al., 2013](https://www.google.com/url?q=https%3A%2F%2Farxiv.org%2Fabs%2F1312.6114) for more details). This formulation allows us to use the "Variational lower bound" which basically helps us approximate the log-likelihood of the train data using gradient-based methods by finding a lower bound to this log-likelihood. This tells us that $log(p_{\theta}(x_0)) > L$, where $L$ is the equation above from the paper. Meaning that if we maximize the negative of it $-log(p_{\theta}(x_0))$ through optimization then we'll find a solution to our problem. Why maximizing? Because it'll just bring us in the correct direction to our solution if we move to this bound that they found, even if the solution isn't necessarily the actual maximum.
 
 We're done, right? Not really...
 
@@ -143,7 +143,7 @@ The above is still too complex to compute, we need to decompose further. We alre
 
 $q(x_t|x_0) = \mathcal{N}(x_t; \sqrt{\overline{\alpha_t}}x_0,(1 - \overline{\alpha_t}) \mathbf{I})$
 
-What do you notice? We were able to rewrite the forward process $q$ so that instead of having to loop from $x_0$ to $x_1$, ..., $x_t$, we can do it by simply using our first image $x_0$ and simply doing a product of the $\alpha_s$ from $s=1$ to $s=t$ and giving it to our forward process. Basically, this shows that we can just sample Gaussian noise an scale it appropriatly (using the $\alpha_s$) and add it to $x_0$ to get $x_t$ directly. Let's not forget that the $alpha_s$ are just $\alpha_t = 1 - \beta_t$, so a function of $\beta_t$ which we already precalculated above with our linear schedule.
+What do you notice? We were able to rewrite the forward process $q$ so that instead of having to loop from $x_0$ to $x_1$, ..., $x_t$, we can do it by simply using our first image $x_0$ and simply doing a product of the $\alpha_s$ from $s=1$ to $s=t$ and giving it to our forward process. Basically, this shows that we can just sample Gaussian noise and scale it appropriatly (using the $\alpha_s$) and add it to $x_0$ to get $x_t$ directly. Let's not forget that the $\alpha_s$ are just $\alpha_t = 1 - \beta_t$, so a function of $\beta_t$ which we already precalculated above with our linear schedule.
 
 <notequote>
 This property will allow us to optimize random terms of the loss function L since we can now get to any time step t from t=0
@@ -151,19 +151,25 @@ This property will allow us to optimize random terms of the loss function L sinc
 
 The paper also decomposes even more the proposed loss to make it more efficient:
 
-![loss_ddpm_1](/static/images/tp-3/loss_ddpm_2.png)
+![loss_ddpm_2](/images/tp-3/loss_ddpm_2.png)
 
 We see they decompose it into $L = L_0 + L_1 + ... + L_T$ and that each $L_t$ term except for $L_0$ are a KL-divergence (or  [Kullback–Leibler (KL) divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) is a function that computes the difference or distance between two probability distributions) between $q$ and $p_\theta$ which are two Gaussian distributions. The loss can then be rewritten as an L2-loss by using the means of each distribution.
 
-Finally, they do one final reparametrization on the mean that enables the network to predict the added noise on an image instead of of predicting the mean itself (if you want more more details, see [section 3.2 of the paper](https://arxiv.org/pdf/2006.11239)). This means that the network actually becomes a noise predictor rather than a Gaussian mean predictor. The mean reparametrization looks like this:
+Finally, they do one final reparametrization on the mean that enables the network to predict the added noise on an image instead of of predicting the mean itself. This means that the network actually becomes a noise predictor rather than a Gaussian mean predictor. The mean reparametrization looks like this:
 
 ![reparam_mean](/images/tp-3/reparam_mean.png)
 
-This leads us to the following loss function:
+Plugging this into the Gaussian probability density function (PDF) leads us to the following loss function:
 
 $L = || \mathbf{\epsilon} - \mathbf{\epsilon}_\theta(x_t, t) ||^2 $
 
 $L = || \mathbf{\epsilon} - \mathbf{\epsilon}_\theta( \sqrt{\bar{\alpha}_t} x_0 + \sqrt{(1- \bar{\alpha}_t)  } \mathbf{\epsilon}, t) ||^2.$
+
+<notequote>
+There should be constants left, on the left side of the formula, that depend on β but the authors just removed them to simplify the final loss and constants don't usually affect things much.
+</notequote>
+
+*If you want more more details on the calculations, see [section 3.2 of the paper](https://arxiv.org/pdf/2006.11239).*
 
 $x_0$ being the initial unmodified image, $\mathbf{\epsilon}$ is the noise level at time step $t$ and $\mathbf{\epsilon}_\theta (x_t, t)$ is our neural network.
 
@@ -171,7 +177,7 @@ After all this simplification we just end up with a simple Mean Squared Error (M
 
 The final training procedure is:
 
-![ddpm_training](static/images/tp-3/ddpm_training.png)
+![ddpm_training](/images/tp-3/ddpm_training.png)
 
 In other words:
 * We take a random image $x_0$ from the train dataset $q(x_0)$
@@ -179,28 +185,134 @@ In other words:
 * We sample some noise from a Gaussian distribution and corrupt the input by this noise at level $t$
 * The neural network is trained to predict this noise based on the corruped image $x_t$. It'll try to find the noise that was applied on $x_0$ based on the fixed schedule $\beta_t$.
 
+That was a lot of reparametrization but we got there, now let's try to understand the procedure to generate an image.
+
 ### Generating an Image by Sampling
 
+Generating an image is actually quite simple (relatively to what we just saw). We say that we "sample" an image because we get it from a distribution. In our case, we did all this hard work to be able to work with Gaussian distributions, so let's use it.
 
+The process to sample an image is basically to start from a pure noise image, reverse the noise as much as we can until we end up with a clean image.
 
-## Let's Implement This!
+![reverse_diffusion](/images/tp-3/reverse_diffusion.png)
+*<center><small>Forward/Reverse diffusion process</small></center>*
 
-Ok, we went quite deep in the theory, but we're finally at the implementation phase. Let's generate some images!
+To sample from a standard Gaussian (or Normal) distribution we just do $\mathbf{z} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ and since we want to sample from our own Gaussian distribution for which we learned the mean and variance parameters, let's scale our samples: $\mathbf{z_{\theta, t}} = \mathbf{\mu_\theta(x_t, t)} + \sigma_t \mathbf{z}$, and $\mathbf{z_{\theta, t}}$ is our approximate to $x_{t-1}$ having started from $t=T$, we want to go to $t=0$ using repetitive sampling until we get $x_0$, a real image.
 
+In our case: $x_{t-1} = \frac{1}{\sqrt(\alpha_t)}(x_t - \frac{\beta_t}{\sqrt{1 - \overline{\alpha_t}}} \epsilon(x_t, t) ) + \sigma_t z$, where $\mathbf{z} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ from our simple Gaussian distribution. 
 
+We end up with the following algorithm for generating an image:
 
-### $\beta$-Variance Schedule
+![ddpm_sampling](/images/tp-3/ddpm_sampling.png)
 
-The $\beta_t$ linear schedule is actually quite strong because noise grows very rapidly and we even start having issues recognizing the original image with the naked eye.
+We finally have the full algorithm to start implementing our new model!
 
-<exercise>
-Improve the current scheduling by implementing cosine scheduling as proposed above.
-</exercise>
 
 ### Something to Note
 
 Diffusion Models also exist under different forms mathematically speaking that all have different names (like Score-based generative models, SDE-based generative models, Langevin dynamics, etc) that people discovered at different times. To learn more, read [this](http://yang-song.net/blog/2021/score/).
 
+
+## Let's Implement This!
+
+Ok, we went quite deep in the theory, but we're finally at the implementation phase. Let's train a model to generate some images!
+
+First, clone the repository found [here](https://github.com/cpcdoy/dl_practical_work) and you'll find many helper files in the `practical_work_3_ddpm/` folder and you will be using the helper functions in there and importing them in your notebook, or in your Python files, up to you.
+
+### Loading and Process the Dataset
+
+Let's generate images from the Fashion MNIST dataset. It's basically the equivalent of the handwritten digit dataset MNIST but for clothes, so it's a more complex dataset. There are 10 classes of clothes and the images are grayscale and $28x28$ in size to match the original MNIST dataset.
+
+https://huggingface.co/datasets/cifar10
+
+![cifar10_sample](static/images/tp-3/cifar10_sample.jpg)
+*<center><small>Example image from CIFAR10: A cat yawning</small></center>*
+
+Let's use 🤗 Datasets to load this dataset very easily:
+
+```Python
+from datasets import load_dataset
+
+dataset = load_dataset("cifar10") # load dataset from the hub
+image_size = 32 # Height = Width = 32
+channels = 3 # RGB image so 3 channels
+batch_size = 128 # Works well on Google Colab with 16GB VRAM but modify this to match your hardware
+```
+
+The paper specifically says that each pixel values are converted from the $[0, 255]$ range into $[-1,1]$. They also apply random horizontal flips to the image to augment the data and say it increases "quality slightly", so we'll do it too:
+
+```Python3
+from torchvision import transforms
+from torch.utils.data import DataLoader
+
+# Define the image transformations using torchvision
+transform = Compose([
+            transforms.RandomHorizontalFlip(), # Horizontal flips augmentation
+            transforms.ToTensor(), # Convert to PyTorch tensor
+            transforms.Lambda(lambda t: (t * 2) - 1) # Convert to the [-1, 1] range
+])
+
+# Transform function
+def transforms(examples):
+   # Apply the transformation on each train image
+   # "img" is the key that contains the image data in the CIFAR10 dataset
+   examples["pixel_values"] = [transform(image) for image in examples["img"]]
+
+   # We remove it since we transformed the image above to what fits us and we don't need the original image anymore
+   del examples["img"]
+
+   return examples
+
+# Apply the transforms
+transformed_dataset = dataset.with_transform(transforms).remove_columns("label")
+
+# Create the dataloader that will output batches of our transformed train data
+dataloader = DataLoader(transformed_dataset["train"], batch_size=batch_size, shuffle=True)
+```
+
+### Instantiate the Model
+
+*Wait, we haven't talked about the model architecture at all, have we?*
+
+To understand the neural network required for this task, let's break it down step-by-step. The network needs to process a noisy image at a given time step and return the predicted noise in the image. This predicted noise is a tensor with the same dimensions as the input image, meaning the network's input and output tensors have identical shapes. So, what kind of neural network is suited for this?
+
+Usually, a network architecture called an *Autoencoder* is used here. Autoencoders feature a "bottleneck" layer between the encoder and decoder. The encoder compresses the image into a smaller hidden representation (), and the decoder reconstructs the image from this representation. This design ensures that the network captures only the most crucial information in the bottleneck layer.
+
+<notequote>
+The "bottleneck" is called like that because it's a place in the network which can't encode a lot of information and this forces the network to compress efficiently the information if it wants to reuse it or even reconstruct it later!
+</notequote>
+
+In terms of architecture, the authors of the DDPM paper opted for an architecture that follows the backbone of [PixelCNN++](https://arxiv.org/abs/1701.05517), which is a U-Net introduced by [Ronneberger et al., 2015](https://arxiv.org/abs/1505.04597) (but based on a [Wide ResNet](https://arxiv.org/abs/1605.07146)). This architecture achieved state-of-the-art results in medical image segmentation at the time. Being an Autoencoder, a U-Net has a bottleneck that helps the network learn essential features. Additionally, it includes residual connections between the encoder and decoder, inspired by [He et al., 2015](https://arxiv.org/abs/1512.03385)'s ResNet, to improve gradient flow.
+
+<questionnote>
+What are possible use cases of an Autoencoder architecture?
+</questionnote>
+
+![u_net](/images/tp-3/u_net.png)
+
+As shown in the figure, a U-Net model first downsamples the input image (reducing its spatial resolution) and then upsamples it back to the original size. 
+
+### $\beta$-Variance Schedule
+
+The $\beta_t$ linear schedule is actually quite strong because noise grows very rapidly and we even start having issues recognizing the original image with the naked eye.
+
+<exercisequote>
+Improve the current scheduling by implementing cosine scheduling as proposed above.
+</exercisequote>
+
+
+# Bonus Exercise
+
+<exercisequote>
+Train this model on your own dataset!
+</exercisequote>
+
+Here's a list of simple datasets:
+
+- CIFAR10
+- CelebA
+- LSUN
+
+These datasets are more complex and will require you have a better GPU or that you're able to run it on Google Colab for 1 day straight on their Free Tier T4 GPUs.
 
 ---
 
