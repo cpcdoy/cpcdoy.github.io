@@ -271,13 +271,168 @@ transformed_dataset = dataset.with_transform(transforms).remove_columns("label")
 dataloader = DataLoader(transformed_dataset["train"], batch_size=batch_size, shuffle=True)
 ```
 
+### Let's Pre-Compute the $\alpha$ and $\beta$ Values
+
+As we went through the formulas in the theory section, we talked a lot about $\alpha$, $\overline{\alpha}$ and $\beta$ values. Let's compute them first since we'll need them later.
+
+We know that our $\beta$ variance values come from a scheduler, so let's implement this scheduler first.
+
+#### $\beta$-Variance Schedule
+
+In the paper, they choose the scheduler to be a simple linear schedule, meaning we get uniformly spaced points from a line. They get values in the range $\beta_1 = 10^{-4}$ to $\beta_T = 0.02$ and let's set the total number of time steps $T = 600$. The implementation is very simple actually:
+
+```Python3
+# timesteps is T
+def linear_beta_schedule(timesteps, beta_start = 0.0001, beta_end = 0.02):
+    return torch.linspace(beta_start, beta_end, timesteps)
+```
+
+<exercisequote>
+Experiment with all these values and plot them on a graph.
+</exercisequote>
+
+There's a slight issue though, even if they choose the linear $\beta$ schedule , further research (Section 3.2 of "Improved Denoising Diffusion Probabilistic Models", [Nichol et al. 2021](https://arxiv.org/abs/2102.09672)) shows that it is actually quite strong because noise grows very rapidly in the first half of the time steps and we even start having issues recognizing the original image with the naked eye. This means that a lot of the time steps almost become unusable for training the model since it will struggle a lot for a while with heavy noise.
+
+The new proposed cosine schedule is defined as follows:
+
+$\overline{\alpha_t} = \frac{f(t)}{f(0)}, f(t) = cos(\frac{t/T + s}{1 + s}.\frac{\pi}{2})$
+
+To go from this definition to variances $\beta_t$, we note that $\beta_t = 1 - \frac{\overline{\alpha_t}}{\overline{\alpha_{t-1}}}$. They set $s = 0.008$.
+
+Finally, the authors [clip](https://pytorch.org/docs/stable/generated/torch.clip.html) the final $\beta$ values to the range $[0.0001, 0.9999]$ to prevent singularities at the end of the diffusion process near $t = T$.
+
+![cosine_schedule](/images/tp-3/cosine_schedule.png)
+*<center><small>$\overline{\alpha_t}$ throughout diffusion in the linear schedule and the proposed cosine schedule.</small></center>*
+
+Read section 3.2 of "Improved Denoising Diffusion Probabilistic Models", [Nichol et al. 2021](https://arxiv.org/abs/2102.09672) carefully.
+
+<exercisequote>
+Improve the current scheduling by implementing cosine scheduling as proposed above.
+</exercisequote>
+
+This is the function you'll need to complete:
+
+```Python3
+# timesteps is T
+def cosine_beta_schedule(timesteps, s=0.008):
+    """
+    cosine schedule as proposed in https://arxiv.org/abs/2102.09672
+    """
+    steps = timesteps + 1
+    t = torch.linspace(0, timesteps, steps)
+    
+    # COMPLETE THIS
+
+    return torch.clip(betas, 0.0001, 0.9999)
+```
+
+#### Let's Compute the Rest of The Constants
+
+With the above we now have computed our $\beta_t$ values. We now needs the $\alpha_t$ values, and after we need the $\overline{\alpha_t}$. On top of that we'll precompute some others values we've seen in several places in the previous sections like $\frac{1}{\sqrt{\alpha_t}}$, $sqrt{\overline{\alpha_t}}$ and $sqrt{1 - \overline{\alpha_t}}$. Finally, we'll pre-compute our posterior variance $q(x_{t-1} | x_t,x_0)$ to use for the forward process.
+
+<exercisequote>
+Compute all the constants.
+</exercisequote>
+
+1. $alphas = 1.0 - betas$
+2. $alphas \\_ cumprod = \prod_{t=0}^{T} alphas$
+   -  Look into [torch.cumprod](https://pytorch.org/docs/stable/generated/torch.cumprod.html)
+3. $sqrt\\_recip\\_alphas = \sqrt{1.0 / alphas}$
+4. $sqrt \\_ alphas \\_ cumprod = \sqrt{alphas \\_ cumprod}$
+5. $sqrt \\_ one \\_ minus \\_ alphas \\_ cumprod = \sqrt{1.0 - alphas \\_ cumprod}$
+
+Complete the following code with the above formulas and add it to your notebook:
+
+```Python3
+timesteps = 600
+
+# define beta schedule
+betas = linear_beta_schedule(timesteps=timesteps) # or `cosine_beta_schedule(timesteps=timesteps)`
+
+# define alphas
+alphas = ...
+alphas_cumprod = ...
+
+# This is just the previous step of the cumulative product above
+# It's just alphas_cumprod without the last value and with a 1.0 padding at the beginning
+alphas_cumprod_prev = F.pad(alphas_cumprod[:-1], (1, 0), value=1.0)
+
+sqrt_recip_alphas = ...
+
+# calculations for diffusion q(x_t | x_{t-1}) and others
+sqrt_alphas_cumprod = ...
+sqrt_one_minus_alphas_cumprod = ...
+
+# calculations for posterior q(x_{t-1} | x_t, x_0)
+posterior_variance = ...
+```
+
+This will help us code the few formulas for diffusion process much more easily.
+
+### Let's Implement The Inference
+
+
+
+### Let's Implement The Training Loss
+
+Take a look at the training loop again:
+
+![ddpm_training_p1](/images/tp-3/ddpm_training_p1.png)
+
+We're going to implement the red part only using a function that will basically help us extract for a given time step $t$ the $\alpha_t$ from all the $alphas$ we computed above:
+
+```Python3
+def extract(a, t, x_shape):
+    batch_size = t.shape[0]
+    out = a.gather(-1, t.cpu())
+    return out.reshape(batch_size, *((1,) * (len(x_shape) - 1))).to(t.device)
+```
+
+So, for example, if we want to extract $sqrt \\_ alphas \\_ cumprod \\_ t$ from $sqrt \\_ alphas \\_ cumprod$, we simply do `extract(sqrt_alphas_cumprod, t, x_start.shape)`, where `sqrt_alphas_cumprod` is one of the constants we computed above for simplicity, `x_start` is the image we start from and `t` the current time step.
+
+<exercisequote>
+Implement the training loss
+</exercisequote>
+
+```Python3
+# forward diffusion
+def q_sample(x_start, t, noise=None):
+   if noise is None:
+      noise = torch.randn_like(x_start)
+
+   # COMPLETE THIS ONLY
+
+
+# This function is already made for you, it computes the full loss from the training loop above using your implementation of `q_sample` (the red rectangle part)
+def p_losses(denoise_model, x_start, t, noise=None, loss_type="l1"):
+   if noise is None:
+      noise = torch.randn_like(x_start)
+
+   # This is where `q_sample` is being used
+   x_noisy = q_sample(x_start=x_start, t=t, noise=noise)
+   predicted_noise = denoise_model(x_noisy, t)
+
+   print("x_noisy.shape", x_noisy.shape)
+
+   if loss_type == 'l1':
+      loss = F.l1_loss(noise, predicted_noise)
+   elif loss_type == 'l2':
+      loss = F.mse_loss(noise, predicted_noise)
+   elif loss_type == "huber":
+      loss = F.smooth_l1_loss(noise, predicted_noise)
+   else:
+      raise NotImplementedError()
+
+   return loss
+```
+
 ### The Model Architecture
 
 *Wait, we haven't talked about the model architecture at all, have we?*
 
 To understand the neural network required for this task, let's break it down step-by-step. The network needs to process a noisy image at a given time step and return the predicted noise in the image. This predicted noise is a tensor with the same dimensions as the input image, meaning the network's input and output tensors have identical shapes. So, what kind of neural network is suited for this?
 
-Usually, a network architecture called an *Autoencoder* is used here. Autoencoders feature a "bottleneck" layer between the encoder and decoder. The encoder compresses the image into a smaller hidden representation, and the decoder reconstructs the image from this representation. This design ensures that the network captures only the most crucial information in the bottleneck layer.
+Usually, a network architecture called an *Autoencoder* is used here. Autoencoders feature a "bottleneck" layer ([literally like a bottle's neck](https://www.leaneast.com/wp-content/uploads/2020/11/Bottlenecks-177x300.png)) between the encoder and decoder. The encoder compresses the image into a smaller hidden representation, and the decoder reconstructs the image from this representation. This design ensures that the network captures only the most crucial information in the bottleneck layer.
 
 <notequote>
 The "bottleneck" is called like that because it's a place in the network which can't encode a lot of information and this forces the network to compress efficiently the information if it wants to reuse it or even reconstruct it later!
@@ -293,32 +448,75 @@ What are possible use cases of an Autoencoder architecture?
 
 As shown in the figure, a U-Net model first downsamples the input image (reducing its spatial resolution) and then upsamples it back to the original size. 
 
-### How Do We Teach Time to Our Model?
+### How Do We Teach The Concept of Time to Our Model?
 
 As we've seen, the diffusion process is time dependent where we have the value $t$ to help us keep track of time. Each time step $t$ works at a specific noise level, so to help our model operate at these specific noise levels, we'll need to feed it the $t$ value.
 
-To implement this, the authors actually use 
+To implement this, the authors actually use the positional encoding method from Transformers (From the foundational paper "Attention Is All You Need" by [Vaswani et al. 2017](https://arxiv.org/abs/1706.03762)).
 
-###   
+<notequote>
+The Transformer architecture, unlike others that use recurrence (like Recurrent Neural Networks (RNNs, LSTMs, GRUs, etc)) by having loops in their architecture, can't encode time. This means that any part of the input or output during training can be looked at in no particular order. Imagine teaching a model to learn to predict the next word in a sentence while it can actually look at words in the future. It doesn't work like that!
+</notequote>
 
-### Let's Implement a U-Net Block
+They introduced Sinusoidal Positional Embeddings that use $sin(x)$ and $cos(x)$ functions that are cyclic functions that don't need to be learned! How can we encode positioning (in this case, time, which is a form of positioning on the axis of time $t$) using these two functions?
 
+The Transformer paper proposes the following functions to generate specific frequencies at each position $pos$ (or timestep $t$ for us): (*[Section 3.5, Positional Encoding](https://arxiv.org/pdf/1706.03762)*)
+
+$PE_{(pos, 2i)} = \sin \left( \frac{pos}{10000^{\frac{2i}{d}}} \right)$
+
+$PE_{(pos, 2i+1)} = \cos \left( \frac{pos}{10000^{\frac{2i}{d}}} \right)$
+
+They basically create several sine and cosine functions with different frequencies, so imagine creating a matrix where each row will contain a new sine/cosine function that oscillates different (higher or lower frequency for each). This basically helps introduces assign a frequency to each time step, meaning that at a specific time step we will add a specific frequency to its embeddings so that, the exact same input at a different time step will have this specific frequency added that will say to the network "Ok, it's the same image but with a different time step, so it should be processed differently according to the current noise level of timestep $t$".
+
+<notequote>
+In the case of Natural Language Processing (NLP) where we process text, a model will need to assign a specific sine/cosine frequency for each word since each word comes at a new time step $t$, similarly to how we speak, we say each word one after the other.
+</notequote>
+
+#### Let's Implement Sinusoidal Positional Embeddings
+
+In our specific case, each input will have only one type of sine/cosine frequency for the entire image since the model only sees one image per timestep $t$ in the input. So we can only output one specific sine/cosine frequency for a given timestep $t$. So let's rewrite the formulas for our case to only generate one frequency at a timestep $t$:
+
+1. We want sine and cosine to each contribute half to the frequency function, so we'll need to define a `half_dim` variable that will just be: `half_dim = image_dim / 2`
+
+2. For the term $10000^{\frac{2i}{d}}$, we will use logarithms for computational stability (to reduce the range of numbers so we don't overflow) and simplicity, we can rewrite it as $log(10000^{\frac{2i}{d}}) = \frac{2i}{d}log(10000)$. In the code we can simplify this to: $embeddings = log(10000)/(half\_dim - 1)$
+
+3. Now, let's generate the values we need to add to our frequency: We need to generate a range of numbers $[0, 1, 2, ..., \frac{d}{2} - 1]$ which we will multiply by $-embeddings$ from above to scale them logarithmically, so now we have: $embeddings = exp(- \frac{log(10000)}{half\_dim - 1})$.
+   - *Quick explanation:* Mathematically, using $exp(x)$ rules, we have $freq(i) = 10000^{- \frac{2i}{d}} = exp(- \frac{2i}{d} log(10000))$ that matches what the Transformers paper says
+
+4. Let's scale the current position (or time step $t$) by doing an outer product with our embeddings: $embeddings = time\_step * embeddings$, where $time\_step$ is basically the time step $t$ we've been talking about this entire time
+   - *Hint:* Make sure to apply it on the correct PyTorch tensor dimensions. You might need to extend the axis size if needed. Look at each tensor's shape (`embeddings` should be a row vector and `time` should be a column vector at the end) while trying to implement this part
+
+5. Finally, we need to concatenate the sine and cosine embeddings along the last dimension: $concatenate(sin(embeddings), cos(embeddings))$
+
+<exercisequote>
+Implement Sinusoidal Positional Embeddings in PyTorch by completing the implementation in the provided file.
+</exercisequote>
+
+Here's the code boilerplate you'll need to complete, you'll find it [here in the Github repo](https://github.com/cpcdoy/dl_practical_work):
+
+```Python3
+class SinusoidalPositionEmbeddings(nn.Module):
+    def __init__(self, dim):
+        super().__init__()
+        self.dim = dim
+
+    def forward(self, time):
+        device = time.device # The device on which to put the tensors we create below
+
+        half_dim = self.dim // 2 # Step 1
+        embeddings = math.log(10000) / (half_dim - 1) # Step 2
+        
+        // COMPLETE THIS
+        
+        return embeddings
+```
+
+### Let's Look at a U-Net Block
 
 
 <exercisequote>
 Implement the U-Net block described here.
 </exercisequote>
-
-
-
-### $\beta$-Variance Schedule
-
-The $\beta_t$ linear schedule is actually quite strong because noise grows very rapidly and we even start having issues recognizing the original image with the naked eye.
-
-<exercisequote>
-Improve the current scheduling by implementing cosine scheduling as proposed above.
-</exercisequote>
-
 
 # Bonus Exercise
 
