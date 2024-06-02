@@ -371,7 +371,28 @@ This will help us code the few formulas for diffusion process much more easily.
 
 ### Let's Implement The Inference
 
+# Algorithm 2 but save all images:
 
+
+```Python3
+@torch.no_grad()
+def p_sample_loop(model, shape):
+    device = next(model.parameters()).device
+
+    b = shape[0]
+    # start from pure noise (for each example in the batch)
+    img = torch.randn(shape, device=device)
+    imgs = []
+    
+    for i in tqdm(reversed(range(0, timesteps)), desc='sampling loop time step', total=timesteps):
+        img = p_sample(model, img, torch.full((b,), i, device=device, dtype=torch.long), i)
+        imgs.append(img.cpu().numpy())
+    return imgs
+
+@torch.no_grad()
+def sample(model, image_size, batch_size=16, channels=3):
+    return p_sample_loop(model, shape=(batch_size, channels, image_size, image_size))
+```
 
 ### Let's Implement The Training Loss
 
@@ -448,7 +469,11 @@ What are possible use cases of an Autoencoder architecture?
 
 As shown in the figure, a U-Net model first downsamples the input image (reducing its spatial resolution) and then upsamples it back to the original size. 
 
-### How Do We Teach The Concept of Time to Our Model?
+### Let's Look at a U-Net Block
+
+
+
+### One More Thing: How Do We Teach The Concept of Time to Our Model?
 
 As we've seen, the diffusion process is time dependent where we have the value $t$ to help us keep track of time. Each time step $t$ works at a specific noise level, so to help our model operate at these specific noise levels, we'll need to feed it the $t$ value.
 
@@ -511,7 +536,6 @@ class SinusoidalPositionEmbeddings(nn.Module):
         return embeddings
 ```
 
-### Let's Look at a U-Net Block
 
 
 <exercisequote>
