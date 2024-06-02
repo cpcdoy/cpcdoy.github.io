@@ -1,6 +1,6 @@
 ---
 title: 3. Intro to Denoising Diffusion Probabilistic Models (DDPMs) for Image Generation
-date: 2024-05-28
+date: 2024-06-02
 images:
 - /images/tp-3/diffusion_model_arch.png
 ---
@@ -211,6 +211,10 @@ We finally have the full algorithm to start implementing our new model!
 
 Diffusion Models also exist under different forms mathematically speaking that all have different names (like Score-based generative models, SDE-based generative models, Langevin dynamics, etc) that people discovered at different times. To learn more, read [this](http://yang-song.net/blog/2021/score/).
 
+Also, some research ("Cold Diffusion: Inverting Arbitrary Image
+Transforms Without Noise", [Bansal et al. 2022](https://arxiv.org/abs/2208.09392)) has been done to actually show that diffusion models don't need to invert actual noise but can actually invert any arbitrary function like blur, masking, snowification (adding a snow like effect) or even animorphosis (transforming into an animal)!
+
+![cold_diffusion](/images/tp-3/cold_diffusion.png)
 
 ## Let's Implement This!
 
@@ -220,21 +224,19 @@ First, clone the repository found [here](https://github.com/cpcdoy/dl_practical_
 
 ### Loading and Process the Dataset
 
-Let's generate images from the Fashion MNIST dataset. It's basically the equivalent of the handwritten digit dataset MNIST but for clothes, so it's a more complex dataset. There are 10 classes of clothes and the images are grayscale and $28x28$ in size to match the original MNIST dataset.
+Let's generate images from the [Fashion MNIST dataset](https://huggingface.co/datasets/fashion_mnist). It's basically the equivalent of the handwritten digit dataset MNIST but for clothes, so it's a more complex dataset. There are 10 classes of clothes and the images are grayscale and $28x28$ in size to match the original MNIST dataset.
 
-https://huggingface.co/datasets/cifar10
+![fashion_mnist](/images/tp-3/fashion_mnist.png)
+*<center><small>Examples from Fashion MNIST</small></center>*
 
-![cifar10_sample](static/images/tp-3/cifar10_sample.jpg)
-*<center><small>Example image from CIFAR10: A cat yawning</small></center>*
-
-Let's use 🤗 Datasets to load this dataset very easily:
+Let's use 🤗 Datasets to load [this dataset](https://huggingface.co/datasets/fashion_mnist) very easily:
 
 ```Python
 from datasets import load_dataset
 
-dataset = load_dataset("cifar10") # load dataset from the hub
-image_size = 32 # Height = Width = 32
-channels = 3 # RGB image so 3 channels
+dataset = load_dataset("fashion_mnist") # load dataset from the hub
+image_size = 28 # Height = Width = 28
+channels = 1 # Grayscale image so 1 channel1
 batch_size = 128 # Works well on Google Colab with 16GB VRAM but modify this to match your hardware
 ```
 
@@ -254,11 +256,11 @@ transform = Compose([
 # Transform function
 def transforms(examples):
    # Apply the transformation on each train image
-   # "img" is the key that contains the image data in the CIFAR10 dataset
-   examples["pixel_values"] = [transform(image) for image in examples["img"]]
+   # "image" is the key that contains the image data in the Fashion MNIST dataset
+   examples["pixel_values"] = [transform(image) for image in examples["image"]]
 
    # We remove it since we transformed the image above to what fits us and we don't need the original image anymore
-   del examples["img"]
+   del examples["image"]
 
    return examples
 
@@ -269,13 +271,13 @@ transformed_dataset = dataset.with_transform(transforms).remove_columns("label")
 dataloader = DataLoader(transformed_dataset["train"], batch_size=batch_size, shuffle=True)
 ```
 
-### Instantiate the Model
+### The Model Architecture
 
 *Wait, we haven't talked about the model architecture at all, have we?*
 
 To understand the neural network required for this task, let's break it down step-by-step. The network needs to process a noisy image at a given time step and return the predicted noise in the image. This predicted noise is a tensor with the same dimensions as the input image, meaning the network's input and output tensors have identical shapes. So, what kind of neural network is suited for this?
 
-Usually, a network architecture called an *Autoencoder* is used here. Autoencoders feature a "bottleneck" layer between the encoder and decoder. The encoder compresses the image into a smaller hidden representation (), and the decoder reconstructs the image from this representation. This design ensures that the network captures only the most crucial information in the bottleneck layer.
+Usually, a network architecture called an *Autoencoder* is used here. Autoencoders feature a "bottleneck" layer between the encoder and decoder. The encoder compresses the image into a smaller hidden representation, and the decoder reconstructs the image from this representation. This design ensures that the network captures only the most crucial information in the bottleneck layer.
 
 <notequote>
 The "bottleneck" is called like that because it's a place in the network which can't encode a lot of information and this forces the network to compress efficiently the information if it wants to reuse it or even reconstruct it later!
@@ -290,6 +292,24 @@ What are possible use cases of an Autoencoder architecture?
 ![u_net](/images/tp-3/u_net.png)
 
 As shown in the figure, a U-Net model first downsamples the input image (reducing its spatial resolution) and then upsamples it back to the original size. 
+
+### How Do We Teach Time to Our Model?
+
+As we've seen, the diffusion process is time dependent where we have the value $t$ to help us keep track of time. Each time step $t$ works at a specific noise level, so to help our model operate at these specific noise levels, we'll need to feed it the $t$ value.
+
+To implement this, the authors actually use 
+
+###   
+
+### Let's Implement a U-Net Block
+
+
+
+<exercisequote>
+Implement the U-Net block described here.
+</exercisequote>
+
+
 
 ### $\beta$-Variance Schedule
 
@@ -309,6 +329,10 @@ Train this model on your own dataset!
 Here's a list of simple datasets:
 
 - CIFAR10
+
+![cifar10_sample](/images/tp-3/cifar10_sample.jpg)
+*<center><small>Example image from CIFAR10: A cat yawning</small></center>*
+
 - CelebA
 - LSUN
 
