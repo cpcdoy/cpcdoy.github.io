@@ -1,6 +1,6 @@
 ---
 title: 3. Intro to Denoising Diffusion Probabilistic Models (DDPMs) for Image Generation
-date: 2024-06-02
+date: 2024-06-03
 images:
 - /images/tp-3/diffusion_model_arch.png
 ---
@@ -40,7 +40,9 @@ You've probably already heard of [DALL-E](https://openai.com/index/dall-e-3/), [
 ![dall_e_3](/images/tp-3/dall_e_3.webp)
 *<center><small>DALL-E 3 Prompt: Imagine a vibrant and picturesque street in La Perla, Puerto Rico, styled in a digital art medium. Colorful houses line the way, with lush, tropical flora accentuating the architecture. Umbrellas add pops of color along the street, which leads to a serene beach where gentle waves meet the shore under a sunset sky.</small></center>*
 
-**Denoising Diffusion Probabilistic Models (DDPMs)**, also called Diffusion Models, work really well and they've beaten other long standing architectures like Generative Adversarial Networks (GANs) at image generation tasks.
+**Denoising Diffusion Probabilistic Models (DDPMs)** is a class of Diffusion Models. They work really well and they've beaten other long standing architectures like Generative Adversarial Networks (GANs) at image generation tasks.
+
+In this practical work, we'll be implementing only the image generation side without the text encoder part.
 
 ## Denoising Diffusion Probabilistic Models (DDPMs)
 
@@ -159,11 +161,11 @@ Finally, they do one final reparametrization on the mean that enables the networ
 
 ![reparam_mean](/images/tp-3/reparam_mean.png)
 
-Plugging this into the Gaussian probability density function (PDF) leads us to the following loss function:
+Plugging this into the Gaussian probability density function (PDF) leads us to the following loss function that computes the difference in mean :
 
-$L = || \mathbf{\epsilon} - \mathbf{\epsilon}_\theta(x_t, t) ||^2 $
+$L_{t-1} = || \mathbf{\epsilon} - \mathbf{\epsilon}_\theta(x_t, t) ||^2 $
 
-$L = || \mathbf{\epsilon} - \mathbf{\epsilon}_\theta( \sqrt{\bar{\alpha}_t} x_0 + \sqrt{(1- \bar{\alpha}_t)  } \mathbf{\epsilon}, t) ||^2.$
+$L_{t-1} = || \mathbf{\epsilon} - \mathbf{\epsilon}_\theta( \sqrt{\bar{\alpha}_t} x_0 + \sqrt{(1- \bar{\alpha}_t)  } \mathbf{\epsilon}, t) ||^2.$
 
 <notequote>
 There should be constants left, on the left side of the formula, that depend on β but the authors just removed them to simplify the final loss and constants don't usually affect things much.
@@ -220,7 +222,7 @@ Transforms Without Noise", [Bansal et al. 2022](https://arxiv.org/abs/2208.09392
 
 Ok, we went quite deep in the theory, but we're finally at the implementation phase. Let's train a model to generate some images!
 
-First, clone the repository found [here](https://github.com/cpcdoy/dl_practical_work) and you'll find many helper files in the `practical_work_3_ddpm/` folder and you will be using the helper functions in there and importing them in your notebook, or in your Python files, up to you.
+First, clone the repository found [here](https://github.com/cpcdoy/dl_practical_work) and you'll find many helper files in the `practical_work_3_ddpm/` folder and you will be using the the provided notebook in which you will complete functions by following the exercises.
 
 ### Loading and Process the Dataset
 
@@ -284,7 +286,9 @@ In the paper, they choose the scheduler to be a simple linear schedule, meaning 
 ```Python3
 # timesteps is T
 def linear_beta_schedule(timesteps, beta_start = 0.0001, beta_end = 0.02):
-    return torch.linspace(beta_start, beta_end, timesteps)
+    betas = torch.linspace(beta_start, beta_end, timesteps)
+
+    return betas
 ```
 
 <exercisequote>
@@ -315,16 +319,25 @@ This is the function you'll need to complete:
 ```Python3
 # timesteps is T
 def cosine_beta_schedule(timesteps, s=0.008):
-    """
-    cosine schedule as proposed in https://arxiv.org/abs/2102.09672
-    """
-    steps = timesteps + 1
-    t = torch.linspace(0, timesteps, steps)
-    
-    # COMPLETE THIS
+   """
+   cosine schedule as proposed in https://arxiv.org/abs/2102.09672
+   """
+   steps = timesteps + 1
+   t = torch.linspace(0, timesteps, steps)
+   
+   # COMPLETE THIS
 
-    return torch.clip(betas, 0.0001, 0.9999)
+   # Clip betas values to what they proposed in the paper
+   return torch.clip(betas, 0.0001, 0.9999)
 ```
+
+<questionquote>
+Why is the cosine schedule better? Are there any other approaches that could work too? (Some of them are mentioned in the DDPM paper)
+</questionquote>
+
+<exercisequote>
+BONUS: Implement other schedule approaches.
+</exercisequote>
 
 #### Let's Compute the Rest of The Constants
 
@@ -371,27 +384,73 @@ This will help us code the few formulas for diffusion process much more easily.
 
 ### Let's Implement The Inference
 
-# Algorithm 2 but save all images:
+Take a look at the inference loop (or sampling as they call it in DDPM specifically):
 
+![ddpm_sampling_p1](/images/tp-3/ddpm_sampling_p1.png)
+
+Let's explain this line by line so you can implement it right after:
+1. $x_t \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$: Here we just sample a noisy image from a Gaussian distribution. This is already implemented for you in the `p_sample_loop` function this way: `torch.randn(shape, device=device)`
+   - You'll find this function in the [notebook in the repository](link)
+2. $\mathbf{for}$ $t = T, ... , 1$ $\mathbf{do}$: This is simply a for loop from the maximum time step $t = T = 600$ to $t=1$. The reverse diffusion process is going from the noisy image to an actual generated image, that's why we reverse the loop. This loop is already implemented for you in the `p_sample_loop` function as: `for i in tqdm(reversed(range(0, timesteps))):`
+
+You will be basically implementing line 3 and 4, and to help with we're going to implement it using a function that will basically help us extract for a given time step $t$ the $\alpha_t$, $\beta_t$ from all the $alphas$ and $betas$ we computed above:
 
 ```Python3
-@torch.no_grad()
-def p_sample_loop(model, shape):
-    device = next(model.parameters()).device
+# This function helps us extract from the array of, for example, all `betas`, the current time step `beta_t`, basically adds the `_t` part our formulas need.
+def extract(a, t, x_shape):
+    batch_size = t.shape[0]
+    out = a.gather(-1, t.cpu())
+    return out.reshape(batch_size, *((1,) * (len(x_shape) - 1))).to(t.device)
+```
 
-    b = shape[0]
-    # start from pure noise (for each example in the batch)
-    img = torch.randn(shape, device=device)
-    imgs = []
-    
-    for i in tqdm(reversed(range(0, timesteps)), desc='sampling loop time step', total=timesteps):
-        img = p_sample(model, img, torch.full((b,), i, device=device, dtype=torch.long), i)
-        imgs.append(img.cpu().numpy())
-    return imgs
+Let's dive into the details:
 
+3. $\mathbf{z} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ if $t > 1$, else \mathbf{z} = 0$. Let's do each branch of the condition:
+   - $\mathbf{z} = 0$ if $t == 0$: This basically sets the right part of the addition on line 4 (red rectangle) $\sigma_t \mathbf{z}$ to $0$, so we just need to return the mean on the right.
+   - $\mathbf{z} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ if $t > 1$: In this part, we just sample noise that has the same shape as $x_t$.
+     - Look into [torch.randn_like](https://pytorch.org/docs/stable/generated/torch.randn_like.html)
+4. This formula just lets us get nearer to a generated image, one step at a time. Let's separate it into two parts, the mean (green highlighted rectangle) and the variance (red highlighted rectangle). Remember that this line is simply $x_{t-1} = \mu_t + \sigma_t \mathbf{z}$, so we just scale our Gaussian noise with the mean $\mu_t$ and variance $\sigma_t$:
+   - The mean $\mu_t = \frac{1}{\sqrt{\alpha_t}} (x_t - \frac{1 - \alpha_t}{\sqrt{1 - \overline{\alpha_t}}} \mathbf{epsilon_\theta}(x_t, t))$. We already precomputed some of the values in the previous section already. Let's decompose it again:
+     - $sqrt \\_ recip \\_ alphas \\_ t = \frac{1}{\sqrt{\alpha_t}}$: and let's not forget to apply `extract(...)` so we get $sqrt \\_ recip \\_ alphas \\_ t$ for this specific time step $t$ from all the $sqrt \\_ recip \\_ alphas$ we already precomputed above. Applying it is simply and you'll do the sme for every other $*_t$ variables, so here's to do it for this step as an example: `sqrt_recip_alphas_t = extract(sqrt_recip_alphas, ts, x_t.shape)`
+     - $betas \\_ t = 1 - \alpha_t$: We also need to apply `extract(betas, ts, x_t.shape)` from our precomputed $betas$ to get $betas \\_ t$.
+     - $sqrt \\_ one \\_ minus \\_ alphas \\_ cumprod \\_ t = \frac{1 - \alpha_t}{\sqrt{1 - \overline{\alpha_t}}}$: We already precomputed all the $sqrt \\_ one \\_ minus \\_ alphas \\_ cumprod$, so you can just sample it with `extract(...)` like above.
+     - $\mathbf{epsilon_\theta}(x_t, t)$ is just applying our model, so it's equivalent to simply calling `model(x_t, ts)`.
+   - We already precomputed posterior variance $\sigma_t$ in $posterior \\_ variance$, which we've already computed thanks to the $betas$ and $alphas$, so we just need to apply `extract(...)` to it and that's it for this part
+
+<exercisequote>
+Complete the following template function you'll find in the notebook
+</exercisequote>
+
+```Python
+# torch.no_grad just tells PyTorch not to store any gradients for this because we don't need them and it takes a lot of memory if it stores them
 @torch.no_grad()
-def sample(model, image_size, batch_size=16, channels=3):
-    return p_sample_loop(model, shape=(batch_size, channels, image_size, image_size))
+def p_sample(model, x_t, ts, current_t):
+   """
+      model: Our model we'll create later
+      x_t: The noisy image of current time_step `t`
+      ts: All the $t$ for the current time step, basically an array with only `t` times the batch size. Remember that we are always computing our formulas for multiple images at the same time (aka all imaages in the batch).
+      current_t: The $t$ integer value from the `ts` array. It's more convenient to have by itself if we want to do the if condition we saw. You could also take the first (or any other) value from the `ts` array, but less convenient.
+   """
+
+   # Extract the current time step constants `*_t` here
+
+   # COMPLETE THIS
+   sqrt_recip_alphas_t = ...
+   betas_t = ...
+   sqrt_one_minus_alphas_cumprod_t = ...
+
+   mean_t = ...
+
+   # The condition line 3 in the algorithm
+   if current_t == 0:
+      # `if t = 0: z = 0` so we can just return the `mean_t`
+      return mean_t
+   else:
+      # COMPLETE THIS
+      posterior_variance_t = ...
+      z = ...
+
+      return mean_t + ...
 ```
 
 ### Let's Implement The Training Loss
@@ -400,50 +459,65 @@ Take a look at the training loop again:
 
 ![ddpm_training_p1](/images/tp-3/ddpm_training_p1.png)
 
-We're going to implement the red part only using a function that will basically help us extract for a given time step $t$ the $\alpha_t$ from all the $alphas$ we computed above:
-
-```Python3
-def extract(a, t, x_shape):
-    batch_size = t.shape[0]
-    out = a.gather(-1, t.cpu())
-    return out.reshape(batch_size, *((1,) * (len(x_shape) - 1))).to(t.device)
-```
-
-So, for example, if we want to extract $sqrt \\_ alphas \\_ cumprod \\_ t$ from $sqrt \\_ alphas \\_ cumprod$, we simply do `extract(sqrt_alphas_cumprod, t, x_start.shape)`, where `sqrt_alphas_cumprod` is one of the constants we computed above for simplicity, `x_start` is the image we start from and `t` the current time step.
+So, for example, if we want to extract $sqrt \\_ alphas \\_ cumprod \\_ t$ from $sqrt \\_ alphas \\_ cumprod$, we simply do `extract(sqrt_alphas_cumprod, t, x_0.shape)`, where `sqrt_alphas_cumprod` is one of the constants we computed above for simplicity, `x_0` is the image we start from and `t` the current time step.
 
 <exercisequote>
-Implement the training loss
+Implement the training loss.
 </exercisequote>
 
 ```Python3
 # forward diffusion
-def q_sample(x_start, t, noise=None):
+def q_sample(x_0, ts, noise=None):
+   """
+      x_0: The original image that we want to add noise to given the specific beta schedule we precomputed above
+      ts: All the $t$ for the current time step, basically an array with only `t` times the batch size. Remember that we are always computing our formulas for multiple images at the same time (aka all imaages in the batch).
+   """
+
    if noise is None:
-      noise = torch.randn_like(x_start)
+      noise = torch.randn_like(x_0)
 
-   # COMPLETE THIS ONLY
+   # COMPLETE THIS
+   sqrt_alphas_cumprod_t = extract(sqrt_alphas_cumprod, ts, x_0.shape)
+   sqrt_one_minus_alphas_cumprod_t = extract(
+      sqrt_one_minus_alphas_cumprod, ts, x_0.shape
+   )
 
+   # The red rectangle part in our formula
+   model_input = ...
+
+   return model_input
 
 # This function is already made for you, it computes the full loss from the training loop above using your implementation of `q_sample` (the red rectangle part)
-def p_losses(denoise_model, x_start, t, noise=None, loss_type="l1"):
+# You can choose between 3 loss types, "l1", "l2" (or Mean Squared Error (MSE), like in the paper) or "huber" (or smooth l1) loss.
+def p_losses(denoise_model, x_0, t, noise=None, loss_type="l1"):
+   # The noise `epsilon` in our equation to which we compare our model noise prediction
    if noise is None:
-      noise = torch.randn_like(x_start)
+      noise = torch.randn_like(x_0)
 
    # This is where `q_sample` is being used
-   x_noisy = q_sample(x_start=x_start, t=t, noise=noise)
+   # `x_noisy` is basically our model input
+   x_noisy = q_sample(x_0=x_0, t=t, noise=noise)
+
+   # epsilon_theta from our formula in the green rectangle
    predicted_noise = denoise_model(x_noisy, t)
 
-   print("x_noisy.shape", x_noisy.shape)
-
+   # The `|| epsilon - epsilon_theta ||^2` part of the equation
+   # The derivative part is only computed later in the training loop by PyTorch as we've been doing for all our models up until now
+   # You can choose between 3 losses, L2/MSE loss is the one from the paper
    if loss_type == 'l1':
+      # Same as L1 without the power of 2
       loss = F.l1_loss(noise, predicted_noise)
    elif loss_type == 'l2':
+      # The loss in the paper
       loss = F.mse_loss(noise, predicted_noise)
    elif loss_type == "huber":
+      # The Huber loss might be slightly better in this case
       loss = F.smooth_l1_loss(noise, predicted_noise)
    else:
+      # If we input any another loss
       raise NotImplementedError()
 
+   # Return the final loss value
    return loss
 ```
 
@@ -469,18 +543,70 @@ What are possible use cases of an Autoencoder architecture?
 
 As shown in the figure, a U-Net model first downsamples the input image (reducing its spatial resolution) and then upsamples it back to the original size. 
 
-### Let's Look at a U-Net Block
+### Let's Look at our U-Net in More Details
+
+Remember that our model $\epsilon_\theta(x_t, t)$ should predict, for each image in a batch and the current time step $t$, the noise that was added to each image, so we can remove it later.
+
+Let's look at the model's inputs and outputs:
+- Inputs:
+  1. A batch of noisy images of shape $(batch \\_ size, channels, height, width)$
+  2. A batch of time steps $t$ of shape $(batch \\_ size, 1)$
+- Outputs:
+  1. The noise added to each image at a specific time step $t$ of shape $(batch \\_ size, channels, height, width)$
+
+Our model is be made of several components:
+   - Positional Embeddings: To give our model a sense of time. It is based on the Transformers paper, "Attention Is All You Need" by [Vaswani et al., 2017](https://arxiv.org/abs/1706.03762)
+   - [ResNet blocks](https://arxiv.org/abs/1605.07146): The Convolutional building blocks of this U-Net (Made of Conv2d -> Group Normalization -> SiLU Activation)
+   - Attention Module: This allows the neural network to focus its attention on the important part of the input. It is also based on the Transformers paper, "Attention Is All You Need" by [Vaswani et al., 2017](https://arxiv.org/abs/1706.03762)
+   - [Group Normalization](https://pytorch.org/docs/stable/generated/torch.nn.GroupNorm.html): A way to apply normalization, like Batch Normalization (BN). Group Normalization (GN) divides the channels into groups and computes within each group the mean and variance for normalization. The authors use this instead of [Weight Normalization](https://pytorch.org/docs/stable/generated/torch.nn.utils.parametrizations.weight_norm.html#torch.nn.utils.parametrizations.weight_norm) to simplify the implementation.
+
+This is how they are assembled to form the final architecture of the U-Net:
+  1. A 2D Convolutional layer of `kernel_size = 7` is applied on the input batch of noisy images. On top of that, we use the current input time step $t$ to compute our Positional Embeddings
+  2. In the downsampling stage (the left part going downward of the U-Net): We apply ResNet blocks with attention and residual connections (also called skip connections) followed by downsampling. This happens several time until we downsample enough to reach the bottleneck stage.
+  3. At the bottom middle part of the network, we have the bottleneck: ResNet blocks and attention are applied there
+  4. In the upsampling stage (the right part going upward of the U-Net): We apply ResNet blocks with attention and residual connections (also called skip connections) followed by upsampling. This happens several time until we upsample enough to reach the the output stage.
+     - This stage receives skip connections from layers at the same height in the downsampling stage: This helps the model reuse previous information it might have lost in the bottleneck and also helps a lot with gradient flow (Vanishing gradients problem).
+  5. Finally, a ResNet block is applied followed by a final convolution to get the correct dimensions for output
+
+#### Let's Implement the U-Net's ResNet Block
+
+We will complete the following function to implement our ResNet block:
+
+```Python3
+class Block(nn.Module):
+    def __init__(self, dim, dim_out, groups = 8):
+        super().__init__()
+        
+        # COMPLETE THIS
+
+    def forward(self, x):
+
+        # COMPLETE THIS
+
+```
+
+You should complete this function in this [Python file]().
+
+We said previously that our U-Net has ResNet blocks, and these blocks are made of:
+1. [2D Convolution](https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html): `Conv2d(dim, dim_out)` with a kernel size of $3$ and a padding of $1$.
+2. [Group Normalization](https://pytorch.org/docs/stable/generated/torch.nn.GroupNorm.html): With the number of groups to separate the channels into being `groups` and the number of channels expected in the input being `dim_out`.
+3. [SiLU (or Swish) Activation](https://pytorch.org/docs/stable/generated/torch.nn.SiLU.html): It is simply a scaled logistic sigmoid you can directly apply at the end. SiLU/Swish being unbounded above, bounded below, non-monotonic, and smooth are all advantageous during training for gradient flow, it's also an easy replacement for ReLU. [Read the Swish paper](https://arxiv.org/abs/1710.05941v1) for more details.
+
+They are applied one after the other in this order: Conv2D -> GroupNorm -> SiLU.
+
+<exercisequote>
+Implement the ResNet block described here by completing the above function and then place it in the appropriate `model.py` Python file.
+</exercisequote>
 
 
-
-### One More Thing: How Do We Teach The Concept of Time to Our Model?
+### So, How Do We Teach The Concept of Time to Our Model?
 
 As we've seen, the diffusion process is time dependent where we have the value $t$ to help us keep track of time. Each time step $t$ works at a specific noise level, so to help our model operate at these specific noise levels, we'll need to feed it the $t$ value.
 
 To implement this, the authors actually use the positional encoding method from Transformers (From the foundational paper "Attention Is All You Need" by [Vaswani et al. 2017](https://arxiv.org/abs/1706.03762)).
 
 <notequote>
-The Transformer architecture, unlike others that use recurrence (like Recurrent Neural Networks (RNNs, LSTMs, GRUs, etc)) by having loops in their architecture, can't encode time. This means that any part of the input or output during training can be looked at in no particular order. Imagine teaching a model to learn to predict the next word in a sentence while it can actually look at words in the future. It doesn't work like that!
+The Transformer architecture, unlike others that use recurrence (like Recurrent Neural Networks (RNNs, LSTMs, GRUs, etc) by having loops in their architecture, can't encode time. This means that any part of the input or output during training can be looked at in no particular order. Imagine teaching a model to learn to predict the next word in a sentence while it can actually look at words in the future. It doesn't work like that!
 </notequote>
 
 They introduced Sinusoidal Positional Embeddings that use $sin(x)$ and $cos(x)$ functions that are cyclic functions that don't need to be learned! How can we encode positioning (in this case, time, which is a form of positioning on the axis of time $t$) using these two functions?
@@ -494,7 +620,7 @@ $PE_{(pos, 2i+1)} = \cos \left( \frac{pos}{10000^{\frac{2i}{d}}} \right)$
 They basically create several sine and cosine functions with different frequencies, so imagine creating a matrix where each row will contain a new sine/cosine function that oscillates different (higher or lower frequency for each). This basically helps introduces assign a frequency to each time step, meaning that at a specific time step we will add a specific frequency to its embeddings so that, the exact same input at a different time step will have this specific frequency added that will say to the network "Ok, it's the same image but with a different time step, so it should be processed differently according to the current noise level of timestep $t$".
 
 <notequote>
-In the case of Natural Language Processing (NLP) where we process text, a model will need to assign a specific sine/cosine frequency for each word since each word comes at a new time step $t$, similarly to how we speak, we say each word one after the other.
+In the case of Natural Language Processing (NLP) where we process text, a model will need to assign a specific sine/cosine frequency for each word since each word comes at a new time step t, similarly to how we speak, we say each word one after the other.
 </notequote>
 
 #### Let's Implement Sinusoidal Positional Embeddings
@@ -514,7 +640,7 @@ In our specific case, each input will have only one type of sine/cosine frequenc
 5. Finally, we need to concatenate the sine and cosine embeddings along the last dimension: $concatenate(sin(embeddings), cos(embeddings))$
 
 <exercisequote>
-Implement Sinusoidal Positional Embeddings in PyTorch by completing the implementation in the provided file.
+Implement Sinusoidal Positional Embeddings in PyTorch by completing the implementation in the provided `model.py` file.
 </exercisequote>
 
 Here's the code boilerplate you'll need to complete, you'll find it [here in the Github repo](https://github.com/cpcdoy/dl_practical_work):
@@ -531,18 +657,39 @@ class SinusoidalPositionEmbeddings(nn.Module):
         half_dim = self.dim // 2 # Step 1
         embeddings = math.log(10000) / (half_dim - 1) # Step 2
         
-        // COMPLETE THIS
+        # COMPLETE THIS FOR THE RESTE OF THE STEPS 3, 4, 5
         
         return embeddings
 ```
 
+### Training The Model
 
+In the notebook, we can now run the training loop with our implementation ready. We'll see that it can take 10-50 epochs to converge to a useful result.
 
 <exercisequote>
-Implement the U-Net block described here.
+Run your training code!
 </exercisequote>
 
-# Bonus Exercise
+Simply running the training loop will get you to a result that looks like this:
+
+![train_res](/images/tp-3/train_res.png)
+*<center><small>A nice t-shirt we generated!</small></center>*
+
+The results look simple, but this method can be scaled on bigger datasets to produce better results but need better hardware and longer training time.
+
+You can also run inference at the end of the notebook yourself in the `Test The Model` section at the end, that will generate random images of clothes.
+
+# Bonus Exercises
+
+## ConvNext Architecture
+
+You might have noticed that when we instantiated our `Unet(...)` model, we set `use_convnext=False` and `resnet_block_groups=1`. The code implements another architecture instead of ResNet, which is called ConvNext from the paper "A ConvNet for the 2020s", [Liu et al, 2022](https://arxiv.org/abs/2201.03545). This architecture tries to modernize ConvNets since recently, [Vision Transformers](https://arxiv.org/abs/2010.11929) (ViTs) have taken over ConvNets. The ConvNext paper argues that ViTs work well but it's not only because of the Transformer architecture but also all the small architecture changes that we done on the side, so applying them to ConvNets should also help them reach the same performance, and it actually worked.
+
+<exercisequote>
+Experiment with ConvNext by setting `use_convnext=True`. What do you see?
+</exercisequote>
+
+We trained our model on a simple dataset, now try training it on more complex datasets, that can have colored images or higher resolution. Keep in mind that this means you'll need a better machine or much longer training time.
 
 <exercisequote>
 Train this model on your own dataset!
@@ -550,13 +697,23 @@ Train this model on your own dataset!
 
 Here's a list of simple datasets:
 
-- CIFAR10
+- [CIFAR10](https://huggingface.co/datasets/uoft-cs/cifar10): Contains 10 classes of some small random images (trucks, cats, etc)
 
-![cifar10_sample](/images/tp-3/cifar10_sample.jpg)
-*<center><small>Example image from CIFAR10: A cat yawning</small></center>*
+ <img src="/images/tp-3/cifar10_sample.jpg" width="128" height="128"> 
 
-- CelebA
-- LSUN
+*<center><small>Example image from CIFAR10: A cat yawning in low res</small></center>*
+
+- [CelebA](https://huggingface.co/datasets/eurecom-ds/celeba-hq-small): Contains celebrity faces
+
+ <img src="/images/tp-3/celeba_example.jpg" width="128" height="128"> 
+
+*<center><small>Example image from CelebA-HQ: Someone famous probably</small></center>*
+
+- LSUN: LSUN has many variants, like [LSUN Bedrooms](https://huggingface.co/datasets/pcuenq/lsun-bedrooms) with images of bedrooms, [LSUN Church](https://huggingface.co/datasets/tglcourse/lsun_church_train) with images of churches, don't ask me why, but they are good already made datasets to try.
+
+<img src="/images/tp-3/lsun_chruch_example.jpg" width="128" height="128"> 
+
+*<center><small>Example image from LSUN Church: Some Church</small></center>*
 
 These datasets are more complex and will require you have a better GPU or that you're able to run it on Google Colab for 1 day straight on their Free Tier T4 GPUs.
 
