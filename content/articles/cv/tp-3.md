@@ -719,7 +719,7 @@ Here's a list of simple datasets:
 
 *<center><small>Example image from LSUN Church: Some Church</small></center>*
 
-These datasets are more complex and will require you have a better GPU or that you're able to run it on Google Colab for 1 day straight on their Free Tier T4 GPUs.
+These datasets are more complex and will require you have a better GPU or that you run it for longer.
 
 ---
 
