@@ -585,7 +585,7 @@ class Block(nn.Module):
 
 ```
 
-You should complete this function in this [Python file]().
+You should complete this function in this [Python file](https://github.com/cpcdoy/dl_practical_work/blob/main/practical_work_3_ddpm/model.py#L53).
 
 We said previously that our U-Net has ResNet blocks, and these blocks are made of:
 1. [2D Convolution](https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html): `Conv2d(dim, dim_out)` with a kernel size of $3$ and a padding of $1$.
@@ -643,7 +643,7 @@ In our specific case, each input will have only one type of sine/cosine frequenc
 Implement Sinusoidal Positional Embeddings in PyTorch by completing the implementation in the provided `model.py` file.
 </exercisequote>
 
-Here's the code boilerplate you'll need to complete, you'll find it [here in the Github repo](https://github.com/cpcdoy/dl_practical_work):
+Here's the code boilerplate you'll need to complete, you'll find it [here in the Github repo](https://github.com/cpcdoy/dl_practical_work/blob/main/practical_work_3_ddpm/model.py#L37):
 
 ```Python3
 class SinusoidalPositionEmbeddings(nn.Module):
@@ -675,7 +675,7 @@ Simply running the training loop will get you to a result that looks like this:
 ![train_res](/images/tp-3/train_res.png)
 *<center><small>A nice t-shirt we generated!</small></center>*
 
-The results look simple, but this method can be scaled on bigger datasets to produce better results but need better hardware and longer training time.
+The results look simple, but this method can be scaled on bigger datasets to produce better results but needs better hardware and longer training time.
 
 You can also run inference at the end of the notebook yourself in the `Test The Model` section at the end, that will generate random images of clothes.
 
