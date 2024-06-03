@@ -475,11 +475,19 @@ If your model doesn't perform well, it might be due to:
 Perform hyperparameter search to find the best learning rate, model size, or any other parameter you find relevant.
 </exercisequote>
 
+---
+
 # You're Done!
 
 Great job, you made it this far!
 
-Send it to my [email adress](mailto:chady1.dimachkie@epita.fr?subject=TP%201) with the subject **Practical Work 1**: [chady1.dimachkie@epita.fr](mailto:chady1.dimachkie@epita.fr?subject=Practical%20Work%201)
+## Class Students
+
+Send it on the associated MS Teams Assignment.
+
+## Anyone else
+
+Send it my [email adress](mailto:chady1.dimachkie@epita.fr?subject=TP%201) with the subject **Practical Work 1**: [chady1.dimachkie@epita.fr](mailto:chady1.dimachkie@epita.fr?subject=Practical%20Work%201)
 
 **Don't hesitate if you have any questions!**
 

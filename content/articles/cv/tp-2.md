@@ -446,13 +446,18 @@ Using the `einops` library which uses an Einstein-inspired notation, rewrite Pix
 Read the documentation of `einops` [here](https://einops.rocks/1-einops-basics/).
 
 ---
-
 # You're Done!
 
 Great job, you made it this far!
+
+## Class Students
+
+Send it on the associated MS Teams Assignment.
+
+## Anyone else
 
 Send it to my [email adress](mailto:chady1.dimachkie@epita.fr?subject=TP%202) with the subject **Practical Work 2**: [chady1.dimachkie@epita.fr](mailto:chady1.dimachkie@epita.fr?subject=Practical%20Work%202)
 
 **Don't hesitate if you have any questions!**
 
-→ [Coming Next: Practical Work 3](/articles/)
+→ [Coming Next: Practical Work 3](/articles/tp-3)
