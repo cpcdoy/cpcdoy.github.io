@@ -222,7 +222,7 @@ Transforms Without Noise", [Bansal et al. 2022](https://arxiv.org/abs/2208.09392
 
 Ok, we went quite deep in the theory, but we're finally at the implementation phase. Let's train a model to generate some images!
 
-First, clone the repository found [here](https://github.com/cpcdoy/dl_practical_work) and you'll find many helper files in the `practical_work_3_ddpm/` folder and you will be using the the provided notebook in which you will complete functions by following the exercises.
+First, clone the repository found [here](https://github.com/cpcdoy/dl_practical_work) and you'll find many helper files in the `practical_work_3_ddpm/` folder and you will be using the [provided notebook](https://github.com/cpcdoy/dl_practical_work/blob/main/practical_work_3_ddpm/pw_ddpm.ipynb) in which you will complete functions by following the exercises.
 
 ### Loading and Process the Dataset
 
@@ -354,7 +354,7 @@ Compute all the constants.
 4. $sqrt \\_ alphas \\_ cumprod = \sqrt{alphas \\_ cumprod}$
 5. $sqrt \\_ one \\_ minus \\_ alphas \\_ cumprod = \sqrt{1.0 - alphas \\_ cumprod}$
 
-Complete the following code with the above formulas and add it to your notebook:
+Complete the following code with the above formulas and add it to your [notebook](https://github.com/cpcdoy/dl_practical_work/blob/main/practical_work_3_ddpm/pw_ddpm.ipynb):
 
 ```Python3
 timesteps = 600
@@ -390,7 +390,7 @@ Take a look at the inference loop (or sampling as they call it in DDPM specifica
 
 Let's explain this line by line so you can implement it right after:
 1. $x_t \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$: Here we just sample a noisy image from a Gaussian distribution. This is already implemented for you in the `p_sample_loop` function this way: `torch.randn(shape, device=device)`
-   - You'll find this function in the [notebook in the repository](link)
+   - You'll find this function in the [notebook in the repository](https://github.com/cpcdoy/dl_practical_work/blob/main/practical_work_3_ddpm/)
 2. $\mathbf{for}$ $t = T, ... , 1$ $\mathbf{do}$: This is simply a for loop from the maximum time step $t = T = 600$ to $t=1$. The reverse diffusion process is going from the noisy image to an actual generated image, that's why we reverse the loop. This loop is already implemented for you in the `p_sample_loop` function as: `for i in tqdm(reversed(range(0, timesteps))):`
 
 You will be basically implementing line 3 and 4, and to help with we're going to implement it using a function that will basically help us extract for a given time step $t$ the $\alpha_t$, $\beta_t$ from all the $alphas$ and $betas$ we computed above:
