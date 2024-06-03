@@ -462,7 +462,7 @@ Take a look at the training loop again:
 So, for example, if we want to extract $sqrt \\_ alphas \\_ cumprod \\_ t$ from $sqrt \\_ alphas \\_ cumprod$, we simply do `extract(sqrt_alphas_cumprod, t, x_0.shape)`, where `sqrt_alphas_cumprod` is one of the constants we computed above for simplicity, `x_0` is the image we start from and `t` the current time step.
 
 <exercisequote>
-Implement the training loss.
+Implement the training loss in your notebook.
 </exercisequote>
 
 ```Python3
@@ -486,7 +486,11 @@ def q_sample(x_0, ts, noise=None):
    model_input = ...
 
    return model_input
+```
 
+This is the complete loss function in which your function will get plugged:
+
+```Python3
 # This function is already made for you, it computes the full loss from the training loop above using your implementation of `q_sample` (the red rectangle part)
 # You can choose between 3 loss types, "l1", "l2" (or Mean Squared Error (MSE), like in the paper) or "huber" (or smooth l1) loss.
 def p_losses(denoise_model, x_0, t, noise=None, loss_type="l1"):
