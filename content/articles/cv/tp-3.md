@@ -410,11 +410,11 @@ Let's dive into the details:
    - $\mathbf{z} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ if $t > 1$: In this part, we just sample noise that has the same shape as $x_t$.
      - Look into [torch.randn_like](https://pytorch.org/docs/stable/generated/torch.randn_like.html)
 4. This formula just lets us get nearer to a generated image, one step at a time. Let's separate it into two parts, the mean (green highlighted rectangle) and the variance (red highlighted rectangle). Remember that this line is simply $x_{t-1} = \mu_t + \sigma_t \mathbf{z}$, so we just scale our Gaussian noise with the mean $\mu_t$ and variance $\sigma_t$:
-   - The mean $\mu_t = \frac{1}{\sqrt{\alpha_t}} (x_t - \frac{1 - \alpha_t}{\sqrt{1 - \overline{\alpha_t}}} \mathbf{epsilon_\theta}(x_t, t))$. We already precomputed some of the values in the previous section already. Let's decompose it again:
+   - The mean $\mu_t = \frac{1}{\sqrt{\alpha_t}} (x_t - \frac{1 - \alpha_t}{\sqrt{1 - \overline{\alpha_t}}} \mathbf{\epsilon_\theta}(x_t, t))$. We already precomputed some of the values in the previous section already. Let's decompose it again:
      - $sqrt \\_ recip \\_ alphas \\_ t = \frac{1}{\sqrt{\alpha_t}}$: and let's not forget to apply `extract(...)` so we get $sqrt \\_ recip \\_ alphas \\_ t$ for this specific time step $t$ from all the $sqrt \\_ recip \\_ alphas$ we already precomputed above. Applying it is simply and you'll do the sme for every other $*_t$ variables, so here's to do it for this step as an example: `sqrt_recip_alphas_t = extract(sqrt_recip_alphas, ts, x_t.shape)`
      - $betas \\_ t = 1 - \alpha_t$: We also need to apply `extract(betas, ts, x_t.shape)` from our precomputed $betas$ to get $betas \\_ t$.
      - $sqrt \\_ one \\_ minus \\_ alphas \\_ cumprod \\_ t = \frac{1 - \alpha_t}{\sqrt{1 - \overline{\alpha_t}}}$: We already precomputed all the $sqrt \\_ one \\_ minus \\_ alphas \\_ cumprod$, so you can just sample it with `extract(...)` like above.
-     - $\mathbf{epsilon_\theta}(x_t, t)$ is just applying our model, so it's equivalent to simply calling `model(x_t, ts)`.
+     - $\mathbf{\epsilon_\theta}(x_t, t)$ is just applying our model, so it's equivalent to simply calling `model(x_t, ts)`.
    - We already precomputed posterior variance $\sigma_t$ in $posterior \\_ variance$, which we've already computed thanks to the $betas$ and $alphas$, so we just need to apply `extract(...)` to it and that's it for this part
 
 <exercisequote>
