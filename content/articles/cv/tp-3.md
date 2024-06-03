@@ -341,7 +341,7 @@ BONUS: Implement other schedule approaches.
 
 #### Let's Compute the Rest of The Constants
 
-With the above we now have computed our $\beta_t$ values. We now needs the $\alpha_t$ values, and after we need the $\overline{\alpha_t}$. On top of that we'll precompute some others values we've seen in several places in the previous sections like $\frac{1}{\sqrt{\alpha_t}}$, $sqrt{\overline{\alpha_t}}$ and $sqrt{1 - \overline{\alpha_t}}$. Finally, we'll pre-compute our posterior variance $q(x_{t-1} | x_t,x_0)$ to use for the forward process.
+With the above we now have computed our $\beta_t$ values. We now needs the $\alpha_t$ values, and after we need the $\overline{\alpha_t}$. On top of that we'll precompute some others values we've seen in several places in the previous sections like $\frac{1}{\sqrt{\alpha_t}}$, $\sqrt{\overline{\alpha_t}}$ and $\sqrt{1 - \overline{\alpha_t}}$. Finally, we'll pre-compute our posterior variance $q(x_{t-1} | x_t,x_0)$ to use for the forward process.
 
 <exercisequote>
 Compute all the constants.
