@@ -421,7 +421,7 @@ Let's dive into the details of line 3 and 4:
      - $\mathbf{\epsilon_\theta}(x_t, t)$ is just applying our model, so it's equivalent to simply calling `model(x_t, ts)`.
    - We already precomputed posterior variance $\sigma$, which we've already computed thanks to the $betas$ and $alphas$, so we just need to apply `extract(...)` to it to get $\sigma_t$ and that's it for this part.
 
-Now, just assemble all the formulas above to get the final formula  
+Now, just assemble all the formulas above to get the final formula from *Algorithm 2: Sampling*.
 
 <exercisequote>
 Complete the following template function you'll find in the notebook
@@ -452,9 +452,11 @@ def p_sample(model, x_t, ts, current_t):
       # `if t = 0: z = 0` so we can just return the `mean_t`
       return mean_t
    else:
-      # COMPLETE THIS
-      # Posterio variance
+      # COMPLETE THIS PART
+
+      # sigma_t is the posterio variance
       sigma_t = ...
+      # z is the noise
       z = ...
 
       return mean_t + ...
@@ -668,7 +670,7 @@ class SinusoidalPositionEmbeddings(nn.Module):
         half_dim = self.dim // 2 # Step 1
         embeddings = math.log(10000) / (half_dim - 1) # Step 2
         
-        # COMPLETE THIS FOR THE RESTE OF THE STEPS 3, 4, 5
+        # COMPLETE THIS FOR THE REST OF THE STEPS 3, 4, 5
         
         return embeddings
 ```
