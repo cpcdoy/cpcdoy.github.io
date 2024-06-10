@@ -353,6 +353,7 @@ Compute all the constants.
 3. $sqrt\\_recip\\_alphas = \sqrt{1.0 / alphas}$
 4. $sqrt \\_ alphas \\_ cumprod = \sqrt{alphas \\_ cumprod}$
 5. $sqrt \\_ one \\_ minus \\_ alphas \\_ cumprod = \sqrt{1.0 - alphas \\_ cumprod}$
+6. $sigma = betas * (1. - alphas \\_ cumprod \\_ prev) / (1. - alphas \\_ cumprod)$: $alphas \\_ cumprod \\_ prev$ is already computed for you below.
 
 Complete the following code with the above formulas and add it to your [notebook](https://github.com/cpcdoy/dl_practical_work/blob/main/practical_work_3_ddpm/pw_ddpm.ipynb):
 
@@ -376,8 +377,8 @@ sqrt_recip_alphas = ...
 sqrt_alphas_cumprod = ...
 sqrt_one_minus_alphas_cumprod = ...
 
-# calculations for posterior q(x_{t-1} | x_t, x_0)
-posterior_variance = ...
+# calculations for posterior variance q(x_{t-1} | x_t, x_0)
+sigma = ...
 ```
 
 This will help us code the few formulas for diffusion process much more easily.
@@ -393,29 +394,34 @@ Let's explain this line by line so you can implement it right after:
    - You'll find this function in the [notebook in the repository](https://github.com/cpcdoy/dl_practical_work/blob/main/practical_work_3_ddpm/)
 2. $\mathbf{for}$ $t = T, ... , 1$ $\mathbf{do}$: This is simply a for loop from the maximum time step $t = T = 600$ to $t=1$. The reverse diffusion process is going from the noisy image to an actual generated image, that's why we reverse the loop. This loop is already implemented for you in the `p_sample_loop` function as: `for i in tqdm(reversed(range(0, timesteps))):`
 
-You will be basically implementing line 3 and 4, and to help with we're going to implement it using a function that will basically help us extract for a given time step $t$ the $\alpha_t$, $\beta_t$ from all the $alphas$ and $betas$ we computed above:
+You will be implementing line 3 and 4, and to help you we're going to implement it using a function that will help us extract for a given time step $t$ the $\alpha_t$, $\beta_t$ from all the $alphas$ and $betas$ we computed above. Just use this function that's already provided in your notebook:
 
 ```Python3
 # This function helps us extract from the array of, for example, all `betas`, the current time step `beta_t`, basically adds the `_t` part our formulas need.
 def extract(a, t, x_shape):
+    # Get the current batch size
     batch_size = t.shape[0]
+    # Get all values from the last axis at the timestep t
     out = a.gather(-1, t.cpu())
+    # Reshape the output to the correct dimensions
     return out.reshape(batch_size, *((1,) * (len(x_shape) - 1))).to(t.device)
 ```
 
-Let's dive into the details:
+Let's dive into the details of line 3 and 4:
 
-3. $\mathbf{z} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ if $t > 1$, else \mathbf{z} = 0$. Let's do each branch of the condition:
+3. $\mathbf{z} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ if $t > 1$, else $\mathbf{z} = 0$. Let's do each branch of the condition:
    - $\mathbf{z} = 0$ if $t == 0$: This basically sets the right part of the addition on line 4 (red rectangle) $\sigma_t \mathbf{z}$ to $0$, so we just need to return the mean on the right.
    - $\mathbf{z} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ if $t > 1$: In this part, we just sample noise that has the same shape as $x_t$.
      - Look into [torch.randn_like](https://pytorch.org/docs/stable/generated/torch.randn_like.html)
 4. This formula just lets us get nearer to a generated image, one step at a time. Let's separate it into two parts, the mean (green highlighted rectangle) and the variance (red highlighted rectangle). Remember that this line is simply $x_{t-1} = \mu_t + \sigma_t \mathbf{z}$, so we just scale our Gaussian noise with the mean $\mu_t$ and variance $\sigma_t$:
    - The mean $\mu_t = \frac{1}{\sqrt{\alpha_t}} (x_t - \frac{1 - \alpha_t}{\sqrt{1 - \overline{\alpha_t}}} \mathbf{\epsilon_\theta}(x_t, t))$. We already precomputed some of the values in the previous section already. Let's decompose it again:
-     - $sqrt \\_ recip \\_ alphas \\_ t = \frac{1}{\sqrt{\alpha_t}}$: and let's not forget to apply `extract(...)` so we get $sqrt \\_ recip \\_ alphas \\_ t$ for this specific time step $t$ from all the $sqrt \\_ recip \\_ alphas$ we already precomputed above. Applying it is simply and you'll do the sme for every other $*_t$ variables, so here's to do it for this step as an example: `sqrt_recip_alphas_t = extract(sqrt_recip_alphas, ts, x_t.shape)`
+     - $sqrt \\_ recip \\_ alphas \\_ t = \frac{1}{\sqrt{\alpha_t}}$: and let's not forget to apply `extract(...)` so we get $sqrt \\_ recip \\_ alphas \\_ t$ for this specific time step $t$ from all the $sqrt \\_ recip \\_ alphas$ we already precomputed above. Applying it is simple and you'll do the same for every other $* \\_ t$ variables, so here's to do it for this step as an example: `sqrt_recip_alphas_t = extract(sqrt_recip_alphas, ts, x_t.shape)`
      - $betas \\_ t = 1 - \alpha_t$: We also need to apply `extract(betas, ts, x_t.shape)` from our precomputed $betas$ to get $betas \\_ t$.
-     - $sqrt \\_ one \\_ minus \\_ alphas \\_ cumprod \\_ t = \frac{1 - \alpha_t}{\sqrt{1 - \overline{\alpha_t}}}$: We already precomputed all the $sqrt \\_ one \\_ minus \\_ alphas \\_ cumprod$, so you can just sample it with `extract(...)` like above.
+     - $sqrt \\_ one \\_ minus \\_ alphas \\_ cumprod \\_ t = \sqrt{1 - \overline{\alpha_t}}$: We already precomputed all the $sqrt \\_ one \\_ minus \\_ alphas \\_ cumprod$ in our constants, so you can just sample it with `extract(...)` like above.
      - $\mathbf{\epsilon_\theta}(x_t, t)$ is just applying our model, so it's equivalent to simply calling `model(x_t, ts)`.
-   - We already precomputed posterior variance $\sigma_t$ in $posterior \\_ variance$, which we've already computed thanks to the $betas$ and $alphas$, so we just need to apply `extract(...)` to it and that's it for this part
+   - We already precomputed posterior variance $\sigma$, which we've already computed thanks to the $betas$ and $alphas$, so we just need to apply `extract(...)` to it to get $\sigma_t$ and that's it for this part.
+
+Now, just assemble all the formulas above to get the final formula  
 
 <exercisequote>
 Complete the following template function you'll find in the notebook
@@ -447,7 +453,8 @@ def p_sample(model, x_t, ts, current_t):
       return mean_t
    else:
       # COMPLETE THIS
-      posterior_variance_t = ...
+      # Posterio variance
+      sigma_t = ...
       z = ...
 
       return mean_t + ...
@@ -531,7 +538,7 @@ def p_losses(denoise_model, x_0, t, noise=None, loss_type="l1"):
 
 To understand the neural network required for this task, let's break it down step-by-step. The network needs to process a noisy image at a given time step and return the predicted noise in the image. This predicted noise is a tensor with the same dimensions as the input image, meaning the network's input and output tensors have identical shapes. So, what kind of neural network is suited for this?
 
-Usually, a network architecture called an *Autoencoder* is used here. Autoencoders feature a "bottleneck" layer ([literally like a bottle's neck](https://www.leaneast.com/wp-content/uploads/2020/11/Bottlenecks-177x300.png)) between the encoder and decoder. The encoder compresses the image into a smaller hidden representation, and the decoder reconstructs the image from this representation. This design ensures that the network captures only the most crucial information in the bottleneck layer.
+Usually, a network architecture called an *Autoencoder* is used here. Autoencoders feature a "bottleneck" layer ([literally like the neck of a bottle where water comes out of at a lower specific rate](https://www.leaneast.com/wp-content/uploads/2020/11/Bottlenecks-177x300.png)) between the encoder and decoder. The encoder compresses the image into a smaller hidden representation, and the decoder reconstructs the image from this representation. This design ensures that the network captures only the most crucial information in the bottleneck layer.
 
 <notequote>
 The "bottleneck" is called like that because it's a place in the network which can't encode a lot of information and this forces the network to compress efficiently the information if it wants to reuse it or even reconstruct it later!
@@ -633,7 +640,7 @@ In our specific case, each input will have only one type of sine/cosine frequenc
 
 1. We want sine and cosine to each contribute half to the frequency function, so we'll need to define a `half_dim` variable that will just be: `half_dim = image_dim / 2`
 
-2. For the term $10000^{\frac{2i}{d}}$, we will use logarithms for computational stability (to reduce the range of numbers so we don't overflow) and simplicity, we can rewrite it as $log(10000^{\frac{2i}{d}}) = \frac{2i}{d}log(10000)$. In the code we can simplify this to: $embeddings = log(10000)/(half\_dim - 1)$
+2. For the term $10000^{\frac{2i}{d}}$, we will use logarithms for computational stability (to reduce the range of numbers so we don't overflow) and simplicity, we can rewrite it as $log(10000^{\frac{2i}{d}}) = \frac{2i}{d}log(10000)$. In the code we can simplify this to: $embeddings = log(10000)/(half \\_ dim - 1)$
 
 3. Now, let's generate the values we need to add to our frequency: We need to generate a range of numbers $[0, 1, 2, ..., \frac{d}{2} - 1]$ which we will multiply by $-embeddings$ from above to scale them logarithmically, so now we have: $embeddings = exp(- \frac{log(10000)}{half\_dim - 1})$.
    - *Quick explanation:* Mathematically, using $exp(x)$ rules, we have $freq(i) = 10000^{- \frac{2i}{d}} = exp(- \frac{2i}{d} log(10000))$ that matches what the Transformers paper says
@@ -674,7 +681,7 @@ In the notebook, we can now run the training loop with our implementation ready.
 Run your training code!
 </exercisequote>
 
-Simply running the training loop will get you to a result that looks like this:
+Running the training loop will get you to a result that looks like this after denoising:
 
 ![train_res](/images/tp-3/train_res.png)
 *<center><small>A nice t-shirt we generated!</small></center>*
