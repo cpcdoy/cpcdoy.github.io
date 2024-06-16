@@ -82,7 +82,7 @@ Examples:
 Research always works in incremental improvements, even if we see breakthrough methods here and there, they often build upon a long list of incremental improvements.
 
 Examples of improvements on [YOLO](https://arxiv.org/abs/1506.02640):
-- [YOLO9000](https://arxiv.org/abs/1612.08242), [YOLOv3](https://arxiv.org/abs/1804.02767), [YOLOv4](https://arxiv.org/abs/2004.10934), [yes they skipped v5](https://github.com/ultralytics/yolov5/issues/11381), [YOLOv6](https://arxiv.org/abs/2209.02976), [YOLOv7](https://arxiv.org/abs/2207.02696), [YOLOv8 paper is not yet ready](https://github.com/ultralytics/ultralytics/issues/204), [YOLOX](https://arxiv.org/abs/2107.08430), [PP-YOLOE](https://arxiv.org/abs/2203.16250) and more!
+- [YOLO9000](https://arxiv.org/abs/1612.08242), [YOLOv3](https://arxiv.org/abs/1804.02767), [YOLOv4](https://arxiv.org/abs/2004.10934), [yes they skipped v5's paper](https://github.com/ultralytics/yolov5/issues/11381), [YOLOv6](https://arxiv.org/abs/2209.02976), [YOLOv7](https://arxiv.org/abs/2207.02696), [YOLOv8 paper is not yet ready](https://github.com/ultralytics/ultralytics/issues/204), [YOLOX](https://arxiv.org/abs/2107.08430), [PP-YOLOE](https://arxiv.org/abs/2203.16250) and more!
 
 ### Papers Introducing a New Framework
 
@@ -159,6 +159,8 @@ We'll use the [Pixel Shuffle](https://arxiv.org/abs/1609.05158) to demonstrate h
 
 In the first pass of reading your paper, you'll read it very roughly, you really want to see if it looks like it'll be useful to you and if the results look interesting. In papers you'll often find the abstract contains a lot of information and summarizes the paper quite well. The figures such as graphs, images or benchmark results will show you the architecture if there is a model, the results of their benchmarks, comparison with other methods and more.
 
+#### The First Page: Title, (Authors) and Abstract
+
 Let's look at the first page of our paper to start the first pass:
 
 <span style="color: blue"> 1. </span> The title: Real-Time Single Image and Video Super-Resolution Using an Efficient Sub-Pixel Convolutional Neural Network
@@ -175,32 +177,44 @@ Let's look at the first page of our paper to start the first pass:
   - If you find the paper interesting, the authors might have written other similar quality work, so it can be good to look up their name later.
 
 
-<notequote>
+<notequote style="margin-top: 150px">
 You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.
 </notequote>
 
 <div>
 
-  <div class="sticky" id="stickyElement">
+  <div style="margin-bottom: 90px" class="sticky" id="stickyElement">
     <img src="/images/tp-4/pixel_shuffle_paper_abstract_p1.png" alt="paper">
   </div>
 
-  <span style="color: red"> 3. </span> The Abstract: This is the part where you need to focus and extract as much information as you can. Let's decompose it: </div> <div>
-  - You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.
+  <span style="color: red"> 3. </span> The Abstract: This is the part where you need to focus and extract as much information as you can. Let's decompose it: 
+  - The beginning of the abstract explains the current context (the paper dates back from 2016) which is that a lot of innovation is happening in the usage of deep learning for single image super resolution (SISR). This means they'll mention a few papers later on that they are improving upon. Notably, they mention that all these methods first apply a fixed upscaling algorithm on the low resolution (LR) images like bicubic interpolation before then trying to reconstruct the detail. This means these methods don't have any tools to actually learn the high resolution (HR) patches of the new image directly, they need to artificially create the correct number of HR pixels first and then actually compute the HR details. That's what they mean by super resolution (SR) being performerd in HR space. Finally, they say that this is suboptimal and computationally ineficient. Suboptimal because bicubic (or any other fix interpolation method) introduce a bias in your SR data and actually changes it! It could make it more blurry or add other kind of details that don't actually exist in the SR image. As for the computational complexity, it's because we have the interpolation method to run on top of our deep neural network which can be costly and could be avoided.
   
-  <div style="margin-bottom: 50px" class="sticky" id="stickyElement"> <img src="/images/tp-4/pixel_shuffle_paper_abstract_p2.png" alt="paper"> </div>
+  </div> <div> <div style="margin-top: 90px; margin-bottom: 50px" class="sticky" id="stickyElement"> <img src="/images/tp-4/pixel_shuffle_paper_abstract_p2.png" alt="paper"> </div>
   
-  - You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.
+  - So, we understand that the main issue is not operating in LR space directly and they introduce a method to do just that in this paper. Here their model will extract feature maps in LR space and somehow they'll get to HR space and since most methods didn't do it then it was a challenge at the time. The model is CNN-based and seems to be very efficient since it can process 1080p videos, which are 1920x1080, meaning 2M+ pixels are processed. We can also assume videos in a range of 20-60 FPS (Frame Per Second) since real-time can mean many things :D. They say that they achieve this on a K2 GPU which is a professional NVIDIA GPU released in 2013 based on the Kepler architecture, so it still required a good enough GPU at the time since professional cards are quite expensive.
 
   </div> <div> <div style="margin-bottom: 70px" class="sticky" id="stickyElement"> <img src="/images/tp-4/pixel_shuffle_paper_abstract_p3.png" alt="paper"> </div>
 
-  - You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.
+  - They now mention how the extracted LR feature maps will get upscaled into HR space: **They introduce a sub-pixel convolution layer**. This is important to note and this is what we'll be trying to look for and understand in this paper since this is the main innovation they mention. This special layer removes the need to operate directly in HR space or to have to destroy features because of using a handcrafted filters because you need to get from LR to HR space at some point. This layer actually learns for each specific feature map to upscale it: This is crucial since it means that each part of the image will now have its own dedicated learned upscaling method applied to it, so all our image features should get upscaled much better and faster!
   
   </div> <div> <div class="sticky" id="stickyElement"> <img src="/images/tp-4/pixel_shuffle_paper_abstract_p4.png" alt="paper"> </div>
 
-  - You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.
+  - Finally, the evaluation approach is mentioned where they use publicly available datasets on which they report better results than previous methods while being much faster. The results are $+0.15dB$ on images and $+0.39dB$ on videos, what does this mean? The $dB$ unit is actually decibels here because the metric they use is probably PSNR which is Peak Signal-to-Noise Ratio. This is a common metric expressed in decibels which quantifies the maximum amount of signal (the actual image pixels) to the noise that is affecting the quality of the image, so a higher PSNR means a better image quality because there is more signal (image pixels) than noise (blur, noise, grain or anything that degrades an image). To explain a bit more, decibels is useful here because it's a logarithmic scale which is useful when comparing relative changes like they are doing by comparing to previous methods and it's also closer to human perception which tends to be logarithmic in nature.
 
   </div>
+
+#### Figures
+
+After reading through the first page which contained both the title and the abstract, we now want to look for figures.
+
+*What are figures and where can we usually find them?*
+
+*Figures* are just drawings, graphs, schematics, images, or anything visual really. Usually they'll have a legend saying `Figure` with the number next to it. They can be found at any page. Some papers even have some before the abstract to illustrate things and make it more appealing which help readers summarize the paper better and faster if results are notable. In our case, we were able to found figures in most pages excluding the first page.
+
+Here are all the figures and tables we can find in this paper:
+
+![all_figure_pixel_shuffle_paper](/images/tp-4/all_figure_pixel_shuffle_paper.png)
 
 
 
