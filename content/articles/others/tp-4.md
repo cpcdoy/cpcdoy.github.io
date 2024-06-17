@@ -1,18 +1,17 @@
 ---
-title: 4. How to Read a Machine Learning Research Paper
+title: 4. How to Read a Machine Learning Research Paper Efficiently
 date: 2024-06-11
 images:
 - /images/tp-4/paper_reading.jpg
 ---
 
-In this third practical work, we'll be learning **How to Read a Machine Learning Paper**.
+In this third practical work, we'll be learning **How to Read a Machine Learning Paper Efficiently**.
 
 # Let's Get Started
 
-
 ## Abstract
 
-As someone studying machine learning, you'll have to read a technical paper at several points in your life to review the current literature on the specific topic you want to research. You've actually already come across several papers while doing the previous [practical works](/articles/).
+As someone studying machine learning, you'll have to read technical papers at several points in your life to review the current literature on specific topics you want to research. You've actually already come across several papers while doing the previous [practical works](/articles/).
 
 Doing a *literature review* is essential when starting to work on a subject: People have probably already looked into the topic you want to study, so learning from their previous work will help you save time and reach a solution faster.
 
@@ -117,7 +116,7 @@ Other types of fun papers are the ones that try to contradict or confirm a commo
 
 A fun example is the paper [Attention is not Explanation](https://arxiv.org/abs/1902.10186) followed very shortly by [Attention is not not Explanation](https://arxiv.org/abs/1908.04626), who's right? 😃
 
-### Bonus
+### And More
 
 There are also just papers that play on the hype of a specific paper name like the famous foundational paper [Attention is All You Need](https://arxiv.org/abs/1706.03762) and use it to make their title more appealing like [Attention Is Not All You Need Anymore](https://arxiv.org/abs/2308.07661). Actually there's a lot more, take a look at [this list](https://github.com/KentoNishi/awesome-all-you-need-papers). You never know, maybe the content is as original as the title.
 
@@ -224,7 +223,7 @@ As we can see, there's a few of them and several types:
   
   <div> <div style="width: 350px; margin-top: 50px; margin-bottom: 70px; margin-left: 600px" class="sticky" id="stickyElement"> <img src="/images/tp-4/plots_figures_ps_paper.png" alt="paper"> </div> </div>
 
-  - *Plots:* Figure 2 is the only plot we have in this paper. It shows the trade-off between speed (x-axis) and accuracy (y-axis) that each models they tested takes. Their model makes no compromise it seems since it is much faster and has higher accuracy than the rest! Also, the plot is in logarithmic scale making it even more impressive!
+  - *Plots:* Figure 2 is the only plot we have in this paper. It shows the trade-off between speed (x-axis) and accuracy (y-axis) that each models they tested takes. Their model makes the least compromise it seems since it is much faster and has higher accuracy than the rest! Also, the plot is in logarithmic scale making it even more impressive!
   
   <div> <div style="width: 350px; margin-bottom: 130px;" class="sticky" id="stickyElement"> <img src="/images/tp-4/all_figures_ps_paper.png" alt="paper"> </div> </div>
 
