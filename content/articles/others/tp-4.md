@@ -59,7 +59,7 @@ When you're reading a paper, the paper never fully solves a problem and then mar
 
 Often, these limitations can be discussed towards the end of the paper or in the conclusion itself. So be sure to look for this. Also, sometimes the researchers won't mention these limitations or haven't yet found them. 
 
-<notequote>
+<notequote class="dark:bg-slate-800" class="dark:bg-slate-800">
 You should know that some research labs are also driven by economical factors. So sometimes they'll make their research look nicer than it actually is. Scores without any way to reproduce them can mean anything!
 </notequote>
 
@@ -140,14 +140,13 @@ Finally, there are papers that are a bit fun, unusual or try to pass a message, 
 
 <h3>← Look at this example paper</h3>
 
-<notequote>
+<notequote class="dark:bg-slate-800">
 
 You've already seen this paper in the previous practical works. It's the **[Pixel Shuffle](https://arxiv.org/abs/1609.05158)** paper!
 
 </notequote>
 
 We'll use the [Pixel Shuffle](https://arxiv.org/abs/1609.05158) to demonstrate how to read a paper effectively. Which you've already look at (in theory :D).
-
 
 ### The First Pass: Title → Abstract → Figures
 
@@ -177,7 +176,7 @@ Let's look at the first page of our paper to start the first pass:
   - If you find the paper interesting, the authors might have written other similar quality work, so it can be good to look up their name later.
 
 
-<notequote style="margin-top: 150px">
+<notequote class="dark:bg-slate-800" style="margin-top: 150px">
 You can also ask yourself, why Twitter would need this kind of research? Imagine the quantity of data they store for the images shared on social media. Reducing this by a factor of 1.5x or 2x would be a huge cost saver for them.
 </notequote>
 
@@ -198,7 +197,7 @@ You can also ask yourself, why Twitter would need this kind of research? Imagine
 
   - They now mention how the extracted LR feature maps will get upscaled into HR space: **They introduce a sub-pixel convolution layer**. This is important to note and this is what we'll be trying to look for and understand in this paper since this is the main innovation they mention. This special layer removes the need to operate directly in HR space or to have to destroy features because of using a handcrafted filters because you need to get from LR to HR space at some point. This layer actually learns for each specific feature map to upscale it: This is crucial since it means that each part of the image will now have its own dedicated learned upscaling method applied to it, so all our image features should get upscaled much better and faster!
   
-  </div> <div> <div class="sticky" id="stickyElement"> <img src="/images/tp-4/pixel_shuffle_paper_abstract_p4.png" alt="paper"> </div>
+  </div> <div> <div style="margin-bottom: 140px" class="sticky" id="stickyElement"> <img src="/images/tp-4/pixel_shuffle_paper_abstract_p4.png" alt="paper"> </div>
 
   - Finally, the evaluation approach is mentioned where they use publicly available datasets on which they report better results than previous methods while being much faster. The results are $+0.15dB$ on images and $+0.39dB$ on videos, what does this mean? The $dB$ unit is actually decibels here because the metric they use is probably PSNR which is Peak Signal-to-Noise Ratio. This is a common metric expressed in decibels which quantifies the maximum amount of signal (the actual image pixels) to the noise that is affecting the quality of the image, so a higher PSNR means a better image quality because there is more signal (image pixels) than noise (blur, noise, grain or anything that degrades an image). To explain a bit more, decibels is useful here because it's a logarithmic scale which is useful when comparing relative changes like they are doing by comparing to previous methods and it's also closer to human perception which tends to be logarithmic in nature.
 
@@ -216,13 +215,31 @@ Here are all the figures and tables we can find in this paper:
 
 ![all_figure_pixel_shuffle_paper](/images/tp-4/all_figure_pixel_shuffle_paper.png)
 
+As we can see, there's a few of them and several types:
+- Figures
+  <div> <div style="width: 350px; margin-bottom: 50px; margin-top: 60px;" class="sticky" id="stickyElement"> <img src="/images/tp-4/internals_figures_ps_paper.png" alt="paper"> </div> </div>
 
+  - *Architecture diagrams:* Figure 1 is an architecture diagram that shows how the model operates in the LR space and when we reach the sub-pixel convolution layer, we see that some reordering is being done to reconstruct the SR features maps into HR space.
+  - *Model internals:* Figures 3 and 4 show filter weights learned by the new operation they introduce. They also compare the filters with other models that solve the same task. We can see in $a$ and $c$ that filters learned by their new model seems to be of higher quality since they are more complex.
+  
+  <div> <div style="width: 350px; margin-top: 50px; margin-bottom: 70px; margin-left: 600px" class="sticky" id="stickyElement"> <img src="/images/tp-4/plots_figures_ps_paper.png" alt="paper"> </div> </div>
+
+  - *Plots:* Figure 2 is the only plot we have in this paper. It shows the trade-off between speed (x-axis) and accuracy (y-axis) that each models they tested takes. Their model makes no compromise it seems since it is much faster and has higher accuracy than the rest! Also, the plot is in logarithmic scale making it even more impressive!
+  
+  <div> <div style="width: 350px; margin-bottom: 130px;" class="sticky" id="stickyElement"> <img src="/images/tp-4/all_figures_ps_paper.png" alt="paper"> </div> </div>
+
+  - *Image results comparison:* Figure 5 and 6 show comparison of super-resolution results from different models, their model and the ground truth. Of course, their model performs the best, even if it can be hard to discern the 2 best models. We can see that the ground is still much more detailed, but these models do an impressive job compared to fixed algorthims such as bicubic interpolation. 
+
+  <div> <div style="width: 350px; margin-top: 50px; margin-bottom: 80px; margin-left: 600px" class="sticky" id="stickyElement"> <img src="/images/tp-4/plots_ps_paper.png" alt="paper"> </div> </div>
+
+- Tables
+  - *Benchmarks:* All tables, from table 1 to 4, are benchmarks that compare several state-of-the-art models as well as bicubic on different upscaling factors and shows that on both image and video ESPCN (their model) outperforms every other model by a significan margin. Remember that the scale is still logarithmic since this is measuring PSNR, so even a small difference is actually quite significative.
 
 ## It's Your Turn!
 
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 
-Read one of the following papers and take notes. On top of that, you'll have to explain the order in which you read the paper and your thought process, things you didn't understand, the research you didn't externally to the paper if you were confused, etc. **You'll be sending me a written report as your practical work!**
+Read one of the following papers and take notes. On top of that, you'll have to explain the order in which you read the paper and your thought process, things you didn't understand, the research you did externally to the paper (Google searches, reading other papers, articles, blogs, etc), if you were confused, etc. **You'll be sending me a written report as your practical work!**
 
 </exercisequote>

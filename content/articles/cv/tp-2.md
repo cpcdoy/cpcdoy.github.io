@@ -82,7 +82,7 @@ In our case, we will be mostly using 2D convolutions for images, but you can use
 ![conv_op](/images/tp-2/conv_op.gif)
 *<center><small>2D Convolution Block. Source: [Medium](https://towardsdatascience.com/intuitively-understanding-convolutions-for-deep-learning-1f6f42faee1)</small></center>*
 
-<notequote>
+<notequote class="dark:bg-slate-800">
 Note that while we say CNNs use convolution, they are actually using cross-correlation. It is a technicality, but in a CNN we do not flip the filter as is required in typical convolutions. However except for this flip, both operations are identical.
 </notequote>
 
