@@ -307,6 +307,8 @@ Finally, we'll [clip](https://pytorch.org/docs/stable/generated/torch.clip.html)
 
 Remember that the cosine schedule should give you values that go towards $0.02$ less quickly, at the beginning and in the middle of the array, than the linear schedule. So compare your values between the two schedules. The last $\beta$ values matters less since it's very close to full of noise anyway.
 
+In the end, this new schedule should in theory converge to better images given enough timesteps and enough training time compared to the linear schedule. On this dataset the difference will be a bit harder to see, but in general it gives better results. 
+
 ![cosine_schedule](/images/tp-3/cosine_schedule.png)
 *<center><small>$\overline{\alpha_t}$ throughout diffusion in the linear schedule and the proposed cosine schedule.</small></center>*
 
