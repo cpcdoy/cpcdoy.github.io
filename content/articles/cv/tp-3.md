@@ -92,7 +92,7 @@ Let's describe the distribution of our training image dataset as $q(x_0)$ from w
 
 Let's also define the Forward diffusion process at each time step $t$: $q(x_t|x_{t-1}) = \mathcal{N}(x_t; \sqrt{1 - \beta_t}x_{t-1},\beta_t \mathbf{I})$, where $\beta_1,...,\beta_T$ ($0 < \beta_t < 1$) is called the variance schedule because it'll modulate the variance of the Gaussian distribution we are sampling from, making it bigger each time step (meaning there is one $\beta_t$ for each time step), meaning we'll have more spread out noise as the time step $t$ increases.
 
-$q(x_t|x_{t-1})$ just means, from the previous image we added noise to, with $x_0$ being the original image without noise, what is the next image with one noise step added to. $\mathcal{N}$ is a Normal distribution, also called a Gaussian distribution, which has two parameters: the mean $\mu$ and variance $\sigma^2 \geq 0$ (Read more [here](https://en.wikipedia.org/wiki/Normal_distribution#Notation) in case you forgot). A nice trick to get the complex Gaussian noise sample we need above from a simple **standard normal distribution** $\mathcal{N}(\mathbf{0}, \mathbf{I})$ with mean $\mu = 0$ and variance $\sigma = 1$ is to get a sample from this simpler Gaussian distribution and then center and scale it by doing this: $x_t = \sqrt{1 - \beta_t} x_{t-1} + \sqrt{\beta_t} \mathbf{\epsilon}$, where $\mathbf{\epsilon} = \sqrt{1 - \beta_t} x_{t-1}$.
+$q(x_t|x_{t-1})$ just means, from the previous image we added noise to, with $x_0$ being the original image without noise, what is the next image with one noise step added to. $\mathcal{N}$ is a Normal distribution, also called a Gaussian distribution, which has two parameters: the mean $\mu$ and variance $\sigma^2 \geq 0$ (Read more [here](https://en.wikipedia.org/wiki/Normal_distribution#Notation) in case you forgot). A nice trick to get the complex Gaussian noise sample we need above from a simple **standard normal distribution** $\mathcal{N}(\mathbf{0}, \mathbf{I})$ with mean $\mu = 0$ and variance $\sigma = 1$ is to get a sample from this simpler Gaussian distribution and then center and scale it by doing this: $x_t = \sqrt{1 - \beta_t} x_{t-1} + \sqrt{\beta_t} \mathbf{\epsilon}$, where $\mathbf{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$.
 
 This was for going from one time step to another. The entire process can be summarized as a [Markov chain](https://en.wikipedia.org/wiki/Markov_chain) that gradually adds Gaussian noise to the data: $q(x_{1:T}|x_0) = \prod_{t=1}^{T} q(x_t|x_{t-1})$.
 This just means that each step depends on the previous one for the next result, like a chain.
@@ -101,7 +101,7 @@ This just means that each step depends on the previous one for the next result, 
 
 As we said, the $\beta_t$ are different at each time step, but what values should we assign each?
 
-The original DDPM paper use a linear schedule, basically just a linear function that increases from $B_1 = 10^{-4}$ to $\beta_T = 0.02$.
+The original DDPM paper uses a linear schedule, basically just a linear function that increases from $\beta_1 = 10^{-4}$ to $\beta_T = 0.02$.
 
 ![beta_linear_schedule](/images/tp-3/beta_linear_schedule.png)
 *<center><small>$\beta$ linear schedule</small></center>*
@@ -116,7 +116,7 @@ These constants were chosen to be small relative to data scaled to $[−1, 1]$, 
 ![diffusion_process](/images/tp-3/diffusion_process.png)
 *<center><small>Right to Left: Forward diffusion process. Left to Right: Reverse diffusion process</small></center>*
 
-Looking back again at the figure above, we see that we actually go back from noisy to less noisy in the reverse process. If we were able to find $p_{\theta(x_{t-1|t})}$, which knowing the noisier image at $x_{t-1}$ could get us a less noisy image $x_{t}$, would be amazing (you'll notice that indices are reversed compared to $q(x_t|x_{t-1})$, since this is the reverse process). Unfortunately, it's impossible to get a closed form formula that will give us the solution, so to solve that we'll simply use a neural network to approximate this conditional probability distribution $p_{\theta(x_{t-1|t})}$ with $\theta$ being the parameters of the neural network, updated by usual gradient descent.
+Looking back again at the figure above, we see that we actually go back from noisy to less noisy in the reverse process. If we were able to find $p_{\theta(x_{t-1|t})}$, which knowing the noisier image at $x_{t-1}$ could get us a less noisy image $x_{t}$, it would be amazing (you'll also notice that indices are reversed compared to $q(x_t|x_{t-1})$, since this is the reverse process). Unfortunately, it's impossible to get a closed form formula that will give us the solution, so to solve that we'll simply use a neural network to approximate this conditional probability distribution $p_{\theta(x_{t-1|t})}$ with $\theta$ being the parameters of the neural network, updated by usual gradient descent.
 
 If we try to deconstruct the process of learning this probability distribution function to simplify things for us, we could assume that the reverse process is also Gaussian, similarly to the forward process. A Gaussian distribution has, again, a mean parameter $\mu$ and a variance $\\Sigma$. Let's write what this function would look like so far: $p_{\theta(x_{t-1|t})} = \mathcal{N}(x_{t-1}; \mu_\theta(x_{t},t), \Sigma_\theta (x_{t},t))$, where we add $\theta$ subscripts to each because we'll want to learn them with our neural network parameters and they'll take as input the current noisy image $x_t$ and the current time step $t$. 
 This is amazing because we simplified the problem to just learning the mean and variance parameters of a Gaussian distribution, can't get simpler right?
@@ -145,7 +145,7 @@ The above is still too complex to compute, we need to decompose further. We alre
 
 $q(x_t|x_0) = \mathcal{N}(x_t; \sqrt{\overline{\alpha_t}}x_0,(1 - \overline{\alpha_t}) \mathbf{I})$
 
-What do you notice? We were able to rewrite the forward process $q$ so that instead of having to loop from $x_0$ to $x_1$, ..., $x_t$, we can do it by simply using our first image $x_0$ and simply doing a product of the $\alpha_s$ from $s=1$ to $s=t$ and giving it to our forward process. Basically, this shows that we can just sample Gaussian noise and scale it appropriatly (using the $\alpha_s$) and add it to $x_0$ to get $x_t$ directly. Let's not forget that the $\alpha_s$ are just $\alpha_t = 1 - \beta_t$, so a function of $\beta_t$ which we already precalculated above with our linear schedule.
+What do you notice? We were able to rewrite the forward process $q$ so that instead of having to loop from $x_0$ to $x_1$, ..., $x_t$, we can do it by simply using our first image $x_0$ and simply doing a product of the $\alpha_s$ from $s=1$ to $s=t$ and giving it to our forward process. Basically, this shows that we can just sample Gaussian noise and scale it appropriately (using the $\alpha_s$) and add it to $x_0$ to get $x_t$ directly. Let's not forget that the $\alpha_s$ are just $\alpha_t = 1 - \beta_t$, so a function of $\beta_t$ which we already precalculated above with our linear schedule.
 
 <notequote>
 This property will allow us to optimize random terms of the loss function L since we can now get to any time step t from t=0
@@ -157,7 +157,7 @@ The paper also decomposes even more the proposed loss to make it more efficient:
 
 We see they decompose it into $L = L_0 + L_1 + ... + L_T$ and that each $L_t$ term except for $L_0$ are a KL-divergence (or  [Kullback–Leibler (KL) divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) is a function that computes the difference or distance between two probability distributions) between $q$ and $p_\theta$ which are two Gaussian distributions. The loss can then be rewritten as an L2-loss by using the means of each distribution.
 
-Finally, they do one final reparametrization on the mean that enables the network to predict the added noise on an image instead of of predicting the mean itself. This means that the network actually becomes a noise predictor rather than a Gaussian mean predictor. The mean reparametrization looks like this:
+Finally, they do one final reparametrization on the mean that enables the network to predict the added noise on an image instead of predicting the mean itself. This means that the network actually becomes a noise predictor rather than a Gaussian mean predictor. The mean reparametrization looks like this:
 
 ![reparam_mean](/images/tp-3/reparam_mean.png)
 
@@ -299,11 +299,13 @@ There's a slight issue though, even if they choose the linear $\beta$ schedule ,
 
 The new proposed cosine schedule is defined as follows:
 
-$\overline{\alpha_t} = \frac{f(t)}{f(0)}, f(t) = cos(\frac{t/T + s}{1 + s}.\frac{\pi}{2})$
+$\overline{\alpha_t} = \frac{f(t)}{f(0)}, f(t) = cos(\frac{t/T + s}{1 + s}.\frac{\pi}{2})^2$, with $s = 0.008$.
 
-To go from this definition to variances $\beta_t$, we note that $\beta_t = 1 - \frac{\overline{\alpha_t}}{\overline{\alpha_{t-1}}}$. They set $s = 0.008$.
+To go from this definition to variances $\beta_t$, we note that $\beta_t = 1 - \frac{\overline{\alpha_t}}{\overline{\alpha_{t-1}}}$. To help you with this part, you should know that $t$ can't be less than $0$. So for $\overline{\alpha_{t-1}}$ you'll take all the $\overline{\alpha_t}$ we computed above and remove the last element of the array. You'll notice that both arrays don't have the same shape anymore, so you'll have two choices, either remove the one element from the $\overline{\alpha_t}$ so it matches the $\overline{\alpha_{t-1}}$ array or you will pad the $\overline{\alpha_{t-1}}$ array with one more element. Up to you to try and see what works best for you.
 
-Finally, the authors [clip](https://pytorch.org/docs/stable/generated/torch.clip.html) the final $\beta$ values to the range $[0.0001, 0.9999]$ to prevent singularities at the end of the diffusion process near $t = T$.
+Finally, we'll [clip](https://pytorch.org/docs/stable/generated/torch.clip.html) the final $\beta$ values to the range $[0.0001, 0.02]$ to prevent singularities at the end of the diffusion process near $t = T$. In the paper, they clip in the range $[0.0001, 0.999]$, but I find this to be too strong for the $\alpha_t$ which can create numerical instabilities and the network would require more dropout to handle this, so we'll stick with the range $[0.0001, 0.02]$ similarly to the linear schedule range.
+
+Remember that the cosine schedule should give you values that go towards $0.02$ less quickly, at the beginning and in the middle of the array, than the linear schedule. So compare your values between the two schedules. The last $\beta$ values matters less since it's very close to full of noise anyway.
 
 ![cosine_schedule](/images/tp-3/cosine_schedule.png)
 *<center><small>$\overline{\alpha_t}$ throughout diffusion in the linear schedule and the proposed cosine schedule.</small></center>*
@@ -327,8 +329,8 @@ def cosine_beta_schedule(timesteps, s=0.008):
    
    # COMPLETE THIS
 
-   # Clip betas values to what they proposed in the paper
-   return torch.clip(betas, 0.0001, 0.9999)
+   # Clip betas values
+   return torch.clip(betas, 0.0001, 0.02)
 ```
 
 <questionquote>
@@ -688,7 +690,7 @@ Running the training loop will get you to a result that looks like this after de
 ![train_res](/images/tp-3/train_res.png)
 *<center><small>A nice t-shirt we generated!</small></center>*
 
-The results look simple, but this method can be scaled on bigger datasets to produce better results but needs better hardware and longer training time.
+The results look simple since we haven't trained the model for a long time, but this method can be scaled for more epochs, also on bigger datasets to produce better results but we need better hardware and longer training times.
 
 You can also run inference at the end of the notebook yourself in the `Test The Model` section at the end, that will generate random images of clothes.
 
