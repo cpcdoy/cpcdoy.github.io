@@ -17,7 +17,6 @@ Doing a *literature review* is essential when starting to work on a subject: Peo
 
 However, reading papers in ML is not always simple, since ML is a complex field applied to many different domains, you'll have to have previous knowledge of mathematics to understand the formulas, you'll need to have a background in programming to be able to implement the paper (ML is literally **Machine** Learning) and on top of all that, you might need to learn some of the specifics of the field your paper is being applied to: e.g. It could be an ML paper applied to the medical field (e.g. The U-Net foundational architecture was introduced in a [Biomedical paper](https://arxiv.org/abs/1505.04597)) or to finance.
 
-
 Also, reading a paper can take you time at the beginning since you'll be lacking many of the concepts and tools to reading them efficiently, so don't give up, you'll get there!
 
 In this practical work, you'll learn how to read a paper fast and get the important information that'll help you.
@@ -101,10 +100,17 @@ A few examples of surveys:
 
 Some papers introduce new metrics to better evaluate model results. This is very important because the metrics we have never show the full picture of your model's behavior.
 
-A few examples of papers introducing datasets:
+A few examples of papers introducing a metric:
   - [Fréchet Inception Distance](https://arxiv.org/abs/1706.08500) (FID) is a metric that improves how similar generated images are to real ones.
   - [Focal Loss](https://arxiv.org/abs/1708.02002) is a loss function that tries to help in the case of imbalanced data. It was introduced in the context of improving object detection methods but can actually be used in many other contexts since it is a modification of the Cross-Entropy loss.
-- Publishing a new dataset:
+
+### Papers Introducing a Dataset
+
+Other papers will introduce a dataset since the current state-of-the-art datasets have either become too easy for current models or researchers know every trick possible to get good scores on these datasets so they become less relevant. Also, there is never enough data in machine learning, and especially deep learning, as we keep scaling models, datasets will keep getting bigger with samples covering more and more cases.
+
+Datasets are extremely important and require very careful study and collection. Many datasets, after they get published and studied heavily, turn out to have a lot of outliers, badly annotated samples or contain imbalanced classes. This is normal and the bigger datasets become the harder it becomes to check for these issues and the more automation and assumptions need to be introduced.
+
+A few examples of papers introducing a dataset:
   - [Microsoft COCO](https://arxiv.org/abs/1405.0312)
   - [CIFAR-100](https://paperswithcode.com/dataset/cifar-100)
   - [MultiNLI](https://arxiv.org/abs/1704.05426)
@@ -135,7 +141,7 @@ Finally, there are papers that are a bit fun, unusual or try to pass a message, 
 
 </div>
 
-## How do we Actually Read a Paper Fast?
+# How do we Actually Read a Paper Fast?
 
 <h3>← Look at this example paper</h3>
 
@@ -147,7 +153,7 @@ You've already seen this paper in the previous practical works. It's the **[Pixe
 
 We'll use the [Pixel Shuffle](https://arxiv.org/abs/1609.05158) to demonstrate how to read a paper effectively. Which you've already look at (in theory :D).
 
-### The First Pass: Title → Abstract → Figures
+## The First Pass: Title → Abstract → Figures
 
 <div>
 
@@ -157,7 +163,7 @@ We'll use the [Pixel Shuffle](https://arxiv.org/abs/1609.05158) to demonstrate h
 
 In the first pass of reading your paper, you'll read it very roughly, you really want to see if it looks like it'll be useful to you and if the results look interesting. In papers you'll often find the abstract contains a lot of information and summarizes the paper quite well. The figures such as graphs, images or benchmark results will show you the architecture if there is a model, the results of their benchmarks, comparison with other methods and more.
 
-#### The First Page: Title, (Authors) and Abstract
+### The First Page: Title, (Authors) and Abstract
 
 Let's look at the first page of our paper to start the first pass:
 
@@ -202,7 +208,7 @@ You can also ask yourself, why Twitter would need this kind of research? Imagine
 
   </div>
 
-#### Figures
+### Figures
 
 After reading through the first page which contained both the title and the abstract, we now want to look for figures.
 
@@ -234,11 +240,71 @@ As we can see, there's a few of them and several types:
 - Tables
   - *Benchmarks:* All tables, from table 1 to 4, are benchmarks that compare several state-of-the-art models as well as bicubic on different upscaling factors and shows that on both image and video ESPCN (their model) outperforms every other model by a significan margin. Remember that the scale is still logarithmic since this is measuring PSNR, so even a small difference is actually quite significative.
 
-## It's Your Turn!
+### Summarize the First Pass
 
+At the beginning it can be a good practice to try and summarize everything to make sure you understood the high level idea of the paper. You can compare this summary to what you actually read in the end and see if you correctly understood the paper.
+
+Here's a summary of what we detailed previously:
+
+The paper is titled "Real-Time Single Image and Video Super-Resolution Using an Efficient Sub-Pixel Convolutional Neural Network". They present a new approach to super-resolution that operates efficiently in real-time both on images and videos. 
+
+Authored by researchers at Twitter, the model architecture is a Convolutional Neural Network (CNN) to which they add a new layer they introduced called sub-pixel convolution layer to upscale images directly from low-resolution (LR) to high-resolution (HR) space, avoiding the computational inefficiency and bias introduced by traditional upscaling methods like bicubic interpolation. This new method allows the model to process high-definition videos very efficiently with better results in both accuracy and speed.
+
+The benchmarks and comparisons show a lot of improvements in PSNR (Peak Signal-to-Noise Ratio) over existing methods. The figures and tables in the paper provide detailed visual and quantitative analyses that describe the model architecture, learned filter weights, and performance metrics that establishes their model as a leading solution on the single-image super-resolution (SISR) task.
+
+## The Second Pass: Introduction and Conclusion
+
+In the second pass, you'll want to understand the context of the paper as well as get more details on what the paper actually concludes. Sometimes abstracts can state wonders but the paper can turn out to not be as revolutionary as claimed.
+
+
+### Introduction
+
+
+While diving into the introduction, we want to learn more about the field, even ideally get context of why this is needed. So we want to answer a few questions like: What are the applications of this research? What are we trying to solve? What did researchers in the field try in the past?
+
+<div> 
+
+Let's answer a few of these:
+
+  <div style="width: 360px; margin-bottom: 50px; height: -50px;" class="sticky"> <img src="/images/tp-4/pixel_shuffle_paper_intro_p1.png" alt="paper"> </div>
+
+#### What are the applications of this research?
+
+Some people met one day and decided that this was worth gathering a group of talented researchers for and pouring money into. So there must be at least a few uses to it. This means that this is a particularly important task to solve that can benefit at least the company researching it. We need to understand what's the use of this research and why it's useful.
+
+Here they interestingly mention *"HDTV, medical imaging, satellite imaging, face recognition and surveillance"* as applications. They could have mentioned image compression or content sharing on social media for a team from Twitter, a social media, but this passed the review stage so we can assume they might not want to disclose all the usage they have for this technology.
+
+</div>
+
+<div>
+
+  <div style="width: 350px; margin-top: 60px;" class="sticky"> <img src="/images/tp-4/pixel_shuffle_paper_intro_p2.png" alt="paper"> </div>
+
+#### What are we trying to solve?
+
+
+
+
+Each task has its own challenges and peculiarities. It's important to figure out early what a paper had to overcome and why it was important to advance the field. If you are, yourself, looking to apply a specific research paper's results to your own use case, then you should cover as many blind spots as possible not to end up with surprises.
+
+</div>
+
+
+#### What did researchers in the field try in the past?
+
+
+
+## The Third Pass: Read the Rest of the Article
+
+
+# It's Your Turn!
 
 <exercisequote class="dark:bg-slate-800">
 
-Read one of the following papers and take notes. On top of that, you'll have to explain the order in which you read the paper and your thought process, things you didn't understand, the research you did externally to the paper (Google searches, reading other papers, articles, blogs, etc), if you were confused, etc. **You'll be sending me a written report as your practical work!**
+Read one of the following papers and take notes. On top of that, you'll have to explain the order in which you read the paper and your thought process, things you didn't understand, the research you did externally to the paper (Google searches, reading other papers, articles, blogs, etc), what confused you, etc. 
+
+**You'll be sending a written report as your practical work!**
+
+Please follow the analysis we did above as your report structure.
 
 </exercisequote>
