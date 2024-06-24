@@ -5,7 +5,7 @@ images:
 - /images/tp-4/paper_reading.jpg
 ---
 
-In this third practical work, we'll be learning **How to Read a Machine Learning Paper Efficiently**.
+In this practical work, we'll be learning **How to Read a Machine Learning Paper Efficiently**.
 
 # Let's Get Started
 
@@ -153,6 +153,20 @@ You've already seen this paper in the previous practical works. It's the **[Pixe
 
 We'll use the [Pixel Shuffle](https://arxiv.org/abs/1609.05158) to demonstrate how to read a paper effectively. Which you've already look at (in theory :D).
 
+The worst strategy for reading a paper is to read it linearly like a book, from first word to last word! It can seem counter-intuitive at the beginning but you'll soon realize that papers aren't a story to follow, but actually each part of the paper can answer multiple questions you have in the order you want.
+
+A good way to fully understand a paper at the beginning is to first get a global view of what's happening. You'll also see that this will save you a lot of time in the future even when you start gaining experience reading papers because you'll be able to spot very quickly if a paper answers the questions you have or not.
+
+After you got good global look, then you can start diving into the details: Do the results look good enough? How did they achieve their results? And so on, until you understand the method and their results.
+
+The methodology you'll follow looks like this:
+  - First Pass: You'll read only the Title, then the Abstract and then Figures
+  - Second Pass: You'll take a look at the introduction and conclusion only
+  - Third Pass: Youl'll start diving into the method, formulas, etc
+  - Fourth Pass: Reread until you understand and can explain yourself very simply the paper without having any questions left in your mind
+
+In the following sections, we'll read this paper together so you can get the feel of how to read a paper, and finally you'll be reading a paper of your own later on to make sure you correctly got the process.
+
 ## The First Pass: Title → Abstract → Figures
 
 <div>
@@ -282,9 +296,7 @@ Here they interestingly mention *"HDTV, medical imaging, satellite imaging, face
 
 #### What are we trying to solve?
 
-Each task has its own challenges and peculiarities. It's important to figure out early what a paper had to overcome and why it was important to advance the field. If you are, yourself, looking to apply a specific research paper's results to your own use case, then you should cover as many blind spots as possible not to end up with surprises.
-
-</div>
+Understanding the specific challenges and unique aspects of each research task is crucial. When examining a paper, it's important to identify early on what obstacles the researchers faced and why their work was significant in advancing the field. If you're considering applying a research paper's findings to your own project, it's best to thoroughly explore all aspects of the study to avoid unexpected issues later on. This comprehensive approach helps ensure that you're well-prepared for any potential challenges when you use their research.
 
 In this case, the paper is tackling the single image super-resolution (SISR) problem. It's not a simple task because:
 
@@ -292,38 +304,61 @@ In this case, the paper is tackling the single image super-resolution (SISR) pro
 2. There are many possible high-resolution images that could have resulted in the same low-resolution image. It's like trying to guess what a person looks like from their shadow, there are many possibilities!
 3. Figuring out which of these possible high-resolution images is the correct one is super tricky.
 
+</div>
+
 The researchers are banking on the idea that a lot of the high-frequency stuff in images is actually redundant. So if we're clever about it, we can reconstruct it from the low-frequency parts we do have. It's kind of like how your brain can fill in the blanks when you're reading a sentence with missing letters.
 
 #### What did researchers in the field try in the past?
 
-Before diving into the nitty-gritty of the paper, it's good to know what others have tried. It gives us context and helps us understand why this new method might be better. Here's a quick rundown:
+<div>
 
-1. Multi-image SR methods: These guys use multiple low-res images of the same scene to try and piece together a high-res version. It's like trying to solve a jigsaw puzzle with pieces from multiple similar puzzles. Sounds cool, but it's computationally heavy and can be a bit of a headache.
+  <div style="width: 350px;" class="sticky"> <img src="/images/tp-4/pixel_shuffle_paper_related_work_p1.png" alt="paper"> </div>
+
+
+Before diving into the details of the paper, it's good to know what others have tried. It gives us context and helps us understand why this new method might be better. Here's a quick rundown:
+
+</div>
+
+
+1. Multi-image SR methods: These methods use multiple low-res images of the same scene to try and piece together a high-res version. In theory they can reconstruct higher fidelity HR images but you don't always have multiple shots of a scene and they're also more computationally heavy.
+
+<div>
+
+  <div style="width: 350px;" class="sticky"> <img src="/images/tp-4/pixel_shuffle_paper_related_work_p2.png" alt="paper"> </div>
+
 
 2. Single Image Super-Resolution (SISR) techniques: These are the cool kids on the block. They try to learn the secret sauce of how images work to guess the high-res details from just one low-res image. It's like being really good at guessing what a zoomed-out picture is showing.
 
-3. Edge-based methods: These focus on making sure the edges in the image stay sharp and crisp.
+  - Edge-based methods: These focus on using information provided by edges in the image to determine how we can reconstruct the HR image.
+ 
+  - Image statistics-based methods: These use the general rules of how images usually look, or make assumptions on the type of destruction (e.g. blurring, noise, etc) that happened to the image to guide the super-resolution process.
+   
+  </div>
+  
+  - Patch-based methods: These work by using information from HR/LR pairs of patches from many images to help reconstruct the current image.
+   
+  - Sparsity-based techniques: These assume that any image can be broken down into a bunch of simple building blocks. They try to learn what these blocks are and how they fit together.
+  
+<div>
+  <div style="width: 350px;" class="sticky"> <img src="/images/tp-4/pixel_shuffle_paper_related_work_p3.png" alt="paper"> </div>
+</div>
 
-4. Image statistics-based methods: These use the general rules of how images usually look to guide the super-resolution process.
-
-5. Patch-based methods: These work by looking at small chunks of the image at a time.
-
-6. Sparsity-based techniques: These assume that any image can be broken down into a bunch of simple building blocks. They try to learn what these blocks are and how they fit together.
-
-7. Neural network-based approaches: These are the new kids on the block, using fancy AI techniques to tackle the problem. They come in all shapes and sizes:
-   - Stacked auto-encoders (fancy way of saying they compress and decompress the image multiple times)
-   - Convolutional neural networks (CNNs) (these are really good at understanding images)
-   - Some other complicated-sounding methods like "multi-stage trainable nonlinear reaction diffusion" and "cascaded sparse coding networks"
-   - Even random forests (which, despite the name, have nothing to do with actual forests)
+  - Neural network-based approaches: These are the new kids on the block, using fancy AI techniques to tackle the problem. They come in all shapes and sizes:
+    - Stacked auto-encoders (fancy way of saying they compress and decompress the image multiple times)
+    - Convolutional neural networks (CNNs) (these are really good at understanding images)
+    - Some other complicated-sounding methods like "multi-stage trainable nonlinear reaction diffusion" and "cascaded sparse coding networks"
+  
+  - And more: Even random forests have been tried.
 
 Each of these methods has its own pros and cons, and researchers are always coming up with new and improved ways to make images sharper and clearer.
 
 
-#### What did researchers in the field try in the past?
+### Conclusion
 
 
 
 ## The Third Pass: Read the Rest of the Article
+
 
 
 # It's Your Turn!
