@@ -259,7 +259,6 @@ In the second pass, you'll want to understand the context of the paper as well a
 
 ### Introduction
 
-
 While diving into the introduction, we want to learn more about the field, even ideally get context of why this is needed. So we want to answer a few questions like: What are the applications of this research? What are we trying to solve? What did researchers in the field try in the past?
 
 <div> 
@@ -280,14 +279,44 @@ Here they interestingly mention *"HDTV, medical imaging, satellite imaging, face
 
   <div style="width: 350px; margin-top: 60px;" class="sticky"> <img src="/images/tp-4/pixel_shuffle_paper_intro_p2.png" alt="paper"> </div>
 
+
 #### What are we trying to solve?
-
-
-
 
 Each task has its own challenges and peculiarities. It's important to figure out early what a paper had to overcome and why it was important to advance the field. If you are, yourself, looking to apply a specific research paper's results to your own use case, then you should cover as many blind spots as possible not to end up with surprises.
 
 </div>
+
+In this case, the paper is tackling the single image super-resolution (SISR) problem. It's not a simple task because:
+
+1. We lose a lot of high-frequency information when we downsample an image. It's like trying to guess what happened between two frames of a video, there's information missing!
+2. There are many possible high-resolution images that could have resulted in the same low-resolution image. It's like trying to guess what a person looks like from their shadow, there are many possibilities!
+3. Figuring out which of these possible high-resolution images is the correct one is super tricky.
+
+The researchers are banking on the idea that a lot of the high-frequency stuff in images is actually redundant. So if we're clever about it, we can reconstruct it from the low-frequency parts we do have. It's kind of like how your brain can fill in the blanks when you're reading a sentence with missing letters.
+
+#### What did researchers in the field try in the past?
+
+Before diving into the nitty-gritty of the paper, it's good to know what others have tried. It gives us context and helps us understand why this new method might be better. Here's a quick rundown:
+
+1. Multi-image SR methods: These guys use multiple low-res images of the same scene to try and piece together a high-res version. It's like trying to solve a jigsaw puzzle with pieces from multiple similar puzzles. Sounds cool, but it's computationally heavy and can be a bit of a headache.
+
+2. Single Image Super-Resolution (SISR) techniques: These are the cool kids on the block. They try to learn the secret sauce of how images work to guess the high-res details from just one low-res image. It's like being really good at guessing what a zoomed-out picture is showing.
+
+3. Edge-based methods: These focus on making sure the edges in the image stay sharp and crisp.
+
+4. Image statistics-based methods: These use the general rules of how images usually look to guide the super-resolution process.
+
+5. Patch-based methods: These work by looking at small chunks of the image at a time.
+
+6. Sparsity-based techniques: These assume that any image can be broken down into a bunch of simple building blocks. They try to learn what these blocks are and how they fit together.
+
+7. Neural network-based approaches: These are the new kids on the block, using fancy AI techniques to tackle the problem. They come in all shapes and sizes:
+   - Stacked auto-encoders (fancy way of saying they compress and decompress the image multiple times)
+   - Convolutional neural networks (CNNs) (these are really good at understanding images)
+   - Some other complicated-sounding methods like "multi-stage trainable nonlinear reaction diffusion" and "cascaded sparse coding networks"
+   - Even random forests (which, despite the name, have nothing to do with actual forests)
+
+Each of these methods has its own pros and cons, and researchers are always coming up with new and improved ways to make images sharper and clearer.
 
 
 #### What did researchers in the field try in the past?
