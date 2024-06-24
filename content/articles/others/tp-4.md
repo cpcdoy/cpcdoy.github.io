@@ -270,6 +270,8 @@ The benchmarks and comparisons show a lot of improvements in PSNR (Peak Signal-t
 
 In the second pass, you'll want to understand the context of the paper as well as get more details on what the paper actually concludes. Sometimes abstracts can state wonders but the paper can turn out to not be as revolutionary as claimed.
 
+The introduction will give a lot more context about the approach and the field and the conclusion should confirm the effectiveness of their approach and state their benchmark results. 
+
 
 ### Introduction
 
@@ -352,8 +354,47 @@ Before diving into the details of the paper, it's good to know what others have 
 
 Each of these methods has its own pros and cons, and researchers are always coming up with new and improved ways to make images sharper and clearer.
 
-
 ### Conclusion
+
+<div>
+  <div style="width: 350px;" class="sticky"> <img src="/images/tp-4/pixel_shuffle_paper_conclusion_p1.png" alt="paper"> </div>
+
+The conclusion usually summarizes the paper's approach and results comparing it to other methods they've tested. It's important to read it to see how their method performed and often they might include a "Future Work" section inside the conclusion or after it to state what are the next possible improvements after their paper.
+
+While reading the conclusion, you should also ask yourself a few questions: What are the main findings? What are the limitations? What future work does the paper suggest?
+
+#### What are the main findings?
+
+The conclusion is quite short and straight to the point, so we quickly understand that the main findings are that an adaptive scaling layer is much better than a non-adaptive one.
+Meaning, a scaling method that adapts to the image and each parts of it is better than a fixed algorithm like bicubic interpolation.
+
+</div>
+
+The authors mention again that their method works in LR space instead of HR space using their sub-pixel convolution layer.
+They also compare the method's computational cost compared to a deconvolution layer and find that at training time their method is faster. Finally, their method is an order of magniture faster ($>10 \times$) and has much better accuracy on both images and videos even compared to CNNs with more parameters, making their method the first usable in real-time on a single GPU.
+
+#### What are the limitations?
+
+<div>
+  <div style="width: 350px;" class="sticky"> <img src="/images/tp-4/pixel_shuffle_paper_conclusion_p2.png" alt="paper"> </div>
+
+Interestingly, in the conclusion, they don't mention any limitations but they suggest limitations in the `5. Future Work` section, so let's take a look at it.
+
+They mention that in videos, most static enough scenes contain frames that share content information. This is definitely useful as multiple shots of the same scene can help reconstruct an image better.
+This implicitely means that their model is limited by the current image only for the reconstruction and can't use any other information even thought they apply their method on videos. The only benefit for videos with their method is speed.
+
+#### What future work does the paper suggest?
+
+From the previous section, we understand that the paper suggest that the ability for their model to use information from neighbouring frames would provide it with additional information to help reconstruction.
+Hence, they will be investigating a spatio-temporal approach of their current model using 3D convolutions, most likely using previous ($n - 1, n - 2, \ldots$) and following ($n + 1, n + 2, \ldots$) frames to help reconstruct better the current ($n$) frame.
+
+</div>
+
+Since we're in the future, it's easy for us to check that they actually went and released a paper that does just that: ["Real-Time Video Super-Resolution with Spatio-Temporal Networks and Motion
+Compensation"](https://arxiv.org/abs/1611.05250) which learns motion estimation based on the previous and next frame and then combines them using 3D convolutions for
+the joint processing of multiple consecutive video frames.
+
+####
 
 
 
