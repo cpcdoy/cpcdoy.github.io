@@ -80,7 +80,7 @@ def create_dataset(n_data:int = 100, a:float = -1.0, b:float = 5, scale:int = 15
 
 Now, let's make it slightly more interesting and make it only look like it's a linear function. For that we'll add some noise. You'll see later that the data you find in real world scenarios has a lot of noise, meaning it's usually not perfect.
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 Plot the above dataset using matplotlib and then play with each parameter.
 </exercisequote>
 
@@ -147,7 +147,7 @@ As simple as that!
 
 The network only takes one input and outputs a single number since we want the network to map each $x$ to its corresponding $y$ value by doing the $ax + b$ transformation.
 
-<questionquote>
+<questionquote class="dark:bg-slate-800">
 What is a &nbsp<i>Linear Neural Network</i>&nbsp equivalent to?
 </questionquote>
 
@@ -208,7 +208,7 @@ In our case, we'll use:
 - Optimizer: [Stochastic Gradient Descent (SGD)](https://pytorch.org/docs/stable/generated/torch.optim.SGD.html)
 - Loss function: [Mean Squared Error (MSE)](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html#torch.nn.MSELoss)
 
-<questionquote>
+<questionquote class="dark:bg-slate-800">
 What is the difference between Stochastic Gradient Descent (SGD) and the usual Gradient Descent (GD)?
 </questionquote>
 
@@ -331,7 +331,7 @@ Your browser does not support MP4 videos somehow...
 
 It fits our more complex dataset much better!
 
-<questionquote>
+<questionquote class="dark:bg-slate-800">
 How do I determine the correct number of steps needed to converge? How do I decide the correct learning rate?
 </questionquote>
 
@@ -390,17 +390,17 @@ Ok, now let's run the training with the above changes:
 Your browser does not support MP4 videos somehow...
 </video>
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 How would you evaluate that the neural network we just trained actually works?
 </exercisequote>
 
-<questionquote>
+<questionquote class="dark:bg-slate-800">
 How are accuracy metrics different from the loss function?
 </questionquote>
 
 #### Bonus
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 Plot the 3D loss landscape of the model.
 </exercisequote>
 
@@ -419,7 +419,7 @@ Please pick one of the following datasets to work on:
 
 Each one of these datasets is easily downloadable using `scikit-learn`. You'll find the loading functions [here](https://scikit-learn.org/stable/datasets/toy_dataset.html#toy-datasets).
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 Train the best model on the task of your choice. Don't forget to read the tips below.
 </exercisequote>
 
@@ -471,7 +471,7 @@ If your model doesn't perform well, it might be due to:
 
 ### Bonus
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 Perform hyperparameter search to find the best learning rate, model size, or any other parameter you find relevant.
 </exercisequote>
 

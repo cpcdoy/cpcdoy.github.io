@@ -101,7 +101,7 @@ It can be interesting to understand what these models are learning internally to
 
 Let's take a look at what's called an [Activation Atlas](https://distill.pub/2019/activation-atlas/) below, specifically that of the [InceptionV1](https://arxiv.org/abs/1409.4842) CNN classifier (also known as "GoogLeNet") developed by Google that notably won the [2014 ImageNet Large Scale Visual Recognition Challenge](https://image-net.org/challenges/LSVRC/2014/index.php).
 
-<questionquote>
+<questionquote class="dark:bg-slate-800">
 Observe multiple layers and concepts in the interactive activation atlas below. What do you learn about CNN architectures?
 </questionquote>
 
@@ -109,7 +109,7 @@ Observe multiple layers and concepts in the interactive activation atlas below. 
 
 *<center><small>Credit: distill.pub</small></center>*
 
-<questionquote>
+<questionquote class="dark:bg-slate-800">
 Why do the activations look like a bad dream come true?
 </questionquote>
 
@@ -125,7 +125,7 @@ $(f * g)(i, j) = \sum_a\sum_b f(a, b) g(i-a, j-b).$
 
 You'll note that there are two coordinates now, since we are working in two dimensions with image data.
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 Play with the below interactive convolution visualizer.
 </exercisequote>
 
@@ -313,7 +313,7 @@ Put this piece of code inside the training loop and run it only every few steps 
 
 This is what this looks like every few steps:
 
-<questionquote>
+<questionquote class="dark:bg-slate-800">
 Observe how the representation evolves. What do you see?
 </questionquote>
 
@@ -322,7 +322,7 @@ Observe how the representation evolves. What do you see?
 Your browser does not support MP4 videos somehow...
 </video>
 
-<questionquote>
+<questionquote class="dark:bg-slate-800">
 What else could we do with this second embedding head of our model?
 </questionquote>
 
@@ -422,7 +422,7 @@ PyTorch fortunately defines [Pixel Shuffle](https://pytorch.org/docs/stable/gene
 
 ## Train Your Model!
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 Study, recreate and plug the network architecture above into the code repository that trains a super-resolution model.
 </exercisequote>
 
@@ -439,7 +439,7 @@ You should get a network that'll create higher resolution images such as this af
 
 ## Last Exercise: DIY Pixel Shuffle!
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 Using the `einops` library which uses an Einstein-inspired notation, rewrite Pixel Shuffle from scratch. Finally, retrain the model and verify that your network still performs the same.
 </exercisequote>
 

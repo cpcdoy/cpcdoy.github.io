@@ -498,7 +498,7 @@ The first two terms in the right-hand side, $\lfloor x/r \rfloor$ and $\lfloor y
 - $\lfloor x/r \rfloor$ maps the x-coordinate from the HR space to the LR space
 - $\lfloor y/r \rfloor$ maps the y-coordinate from the HR space to the LR space
 
-<notequote>
+<notequote class="dark:bg-slate-800">
 
 *The floor operation ($\lfloor \rfloor$) ensures we get integer coordinates in the LR space.*
 
@@ -563,7 +563,7 @@ The authors train their network using mean squared error (MSE) as the loss funct
 
 $\ell(W _{1:L}, b _{1:L}) = \frac{1}{r^2HW} \sum _{x=1}^{rH} \sum _{y=1}^{rW} (I^{HR} _{x,y} - f^L _{x,y}(I^{LR}))^2$
 
-<questionquote>
+<questionquote class="dark:bg-slate-800">
 
 **We might question:** Were there any better choices of loss function?
 
@@ -583,7 +583,7 @@ It includes MSE inside it! Meaning that PSNR is a monotonically decreasing funct
 
 So, for all these reasons they used MSE at the time but it's always a good idea to question and ask why a particular metric (or anything else) was being used instead of another. It's not because that this is a paper that it is perfect.
 
-<notequote>
+<notequote class="dark:bg-slate-800">
 
 Remember: **Doing research is to question everything!**
 

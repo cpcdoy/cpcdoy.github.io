@@ -291,7 +291,7 @@ def linear_beta_schedule(timesteps, beta_start = 0.0001, beta_end = 0.02):
     return betas
 ```
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 Experiment with all these values and plot them on a graph.
 </exercisequote>
 
@@ -314,7 +314,7 @@ In the end, this new schedule should in theory converge to better images given e
 
 Read section 3.2 of "Improved Denoising Diffusion Probabilistic Models", [Nichol et al. 2021](https://arxiv.org/abs/2102.09672) carefully.
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 Improve the current scheduling by implementing cosine scheduling as proposed above.
 </exercisequote>
 
@@ -335,11 +335,11 @@ def cosine_beta_schedule(timesteps, s=0.008):
    return torch.clip(betas, 0.0001, 0.02)
 ```
 
-<questionquote>
+<questionquote class="dark:bg-slate-800">
 Why is the cosine schedule better? Are there any other approaches that could work too? (Some of them are mentioned in the DDPM paper)
 </questionquote>
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 BONUS: Implement other schedule approaches.
 </exercisequote>
 
@@ -347,7 +347,7 @@ BONUS: Implement other schedule approaches.
 
 With the above we now have computed our $\beta_t$ values. We now needs the $\alpha_t$ values, and after we need the $\overline{\alpha_t}$. On top of that we'll precompute some others values we've seen in several places in the previous sections like $\frac{1}{\sqrt{\alpha_t}}$, $\sqrt{\overline{\alpha_t}}$ and $\sqrt{1 - \overline{\alpha_t}}$. Finally, we'll pre-compute our posterior variance $q(x_{t-1} | x_t,x_0)$ to use for the forward process.
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 Compute all the constants.
 </exercisequote>
 
@@ -427,7 +427,7 @@ Let's dive into the details of line 3 and 4:
 
 Now, just assemble all the formulas above to get the final formula from *Algorithm 2: Sampling*.
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 Complete the following template function you'll find in the notebook
 </exercisequote>
 
@@ -474,7 +474,7 @@ Take a look at the training loop again:
 
 So, for example, if we want to extract $sqrt \\_ alphas \\_ cumprod \\_ t$ from $sqrt \\_ alphas \\_ cumprod$, we simply do `extract(sqrt_alphas_cumprod, t, x_0.shape)`, where `sqrt_alphas_cumprod` is one of the constants we computed above for simplicity, `x_0` is the image we start from and `t` the current time step.
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 Implement the training loss in your notebook.
 </exercisequote>
 
@@ -611,7 +611,7 @@ We said previously that our U-Net has ResNet blocks, and these blocks are made o
 
 They are applied one after the other in this order: Conv2D -> GroupNorm -> SiLU.
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 Implement the ResNet block described here by completing the above function and then place it in the appropriate `model.py` Python file.
 </exercisequote>
 
@@ -656,7 +656,7 @@ In our specific case, each input will have only one type of sine/cosine frequenc
 
 5. Finally, we need to concatenate the sine and cosine embeddings along the last dimension: $concatenate(sin(embeddings), cos(embeddings))$
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 Implement Sinusoidal Positional Embeddings in PyTorch by completing the implementation in the provided `model.py` file.
 </exercisequote>
 
@@ -683,7 +683,7 @@ class SinusoidalPositionEmbeddings(nn.Module):
 
 In the notebook, we can now run the training loop with our implementation ready. We'll see that it can take 10-50 epochs to converge to a useful result.
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 Run your training code!
 </exercisequote>
 
@@ -702,13 +702,13 @@ You can also run inference at the end of the notebook yourself in the `Test The 
 
 You might have noticed that when we instantiated our `Unet(...)` model, we set `use_convnext=False` and `resnet_block_groups=1`. The code implements another architecture instead of ResNet, which is called ConvNext from the paper "A ConvNet for the 2020s", [Liu et al, 2022](https://arxiv.org/abs/2201.03545). This architecture tries to modernize ConvNets since recently, [Vision Transformers](https://arxiv.org/abs/2010.11929) (ViTs) have taken over ConvNets. The ConvNext paper argues that ViTs work well but it's not only because of the Transformer architecture but also all the small architecture changes that we done on the side, so applying them to ConvNets should also help them reach the same performance, and it actually worked.
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 Experiment with ConvNext by setting `use_convnext=True`. What do you see?
 </exercisequote>
 
 We trained our model on a simple dataset, now try training it on more complex datasets, that can have colored images or higher resolution. Keep in mind that this means you'll need a better machine or much longer training time.
 
-<exercisequote>
+<exercisequote class="dark:bg-slate-800">
 Train this model on your own dataset!
 </exercisequote>
 
