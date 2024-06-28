@@ -8,7 +8,7 @@ title: Homepage
 
 You'll find tutorials and practical work in the [Tutorials](/articles) section.
 
-The goal of these practical works is to get you started in ML very quickly by going through a lot of notions from the very [basics of neural networks](/articles/mlp/tp-1/) to more complex topics that involves [understanding modern research](/articles/cv/tp-4/) and architectures ([Convolutional Neural Networks](/articles/cv/tp-2/), [Diffusion Models](/articles/cv/tp-3/), and [more](/articles/)).
+The goal of these practical works is to get you started in ML very quickly by going through a lot of notions from the very [basics of neural networks](/articles/mlp/tp-1/) to more complex topics that involves [understanding modern research](/articles/cv/tp-4/), architectures ([Convolutional Neural Networks](/articles/cv/tp-2/), [Diffusion Models](/articles/cv/tp-3/)), learning how to efficiently go beyond by [reading research efficiently](/articles/others/tp-4/), and [more](/articles/)!
 
 <h2>
 
