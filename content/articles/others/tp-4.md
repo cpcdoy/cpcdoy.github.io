@@ -510,7 +510,7 @@ When we say "$\lfloor x/r \rfloor$ maps the x-coordinate from the HR space to th
      HR coordinates 2 and 3 both map to 1 in LR space, and so on.
 
 3. **The Floor Function**:
-   - $\lfloor \rfloor$ (floor function) rounds down to the nearest integer.
+   - $\lfloor x \rfloor$ (floor function) rounds down to the nearest integer.
    - This ensures we always get a valid integer coordinate in the LR space.
 
 Let's look at a concrete example with $r = 2$ (2x upscaling):
