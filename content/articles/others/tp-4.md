@@ -1,6 +1,6 @@
 ---
 title: 4. How to Read a Machine Learning Research Paper Efficiently
-date: 2024-06-11
+date: 2024-06-28
 images:
 - /images/tp-4/paper_reading.jpg
 ---
@@ -139,7 +139,6 @@ Finally, there are papers that are a bit fun, unusual or try to pass a message, 
     <img src="/images/tp-4/pixel_shuffle_paper_border.png" alt="paper">
   </div>
 
-</div>
 
 # How do we Actually Read a Paper Fast?
 
@@ -151,7 +150,7 @@ You've already seen this paper in the previous practical works. It's the **[Pixe
 
 </notequote>
 
-We'll use the [Pixel Shuffle](https://arxiv.org/abs/1609.05158) to demonstrate how to read a paper effectively. Which you've already look at (in theory :D).
+We'll use the [Pixel Shuffle](https://arxiv.org/abs/1609.05158) to demonstrate how to read a paper effectively. Which you've already looked at from the previous practical work (in theory 😀).
 
 The worst strategy for reading a paper is to read it linearly like a book, from first word to last word! It can seem counter-intuitive at the beginning but you'll soon realize that papers aren't a story to follow, but actually each part of the paper can answer multiple questions you have in the order you want.
 
@@ -159,11 +158,13 @@ A good way to fully understand a paper at the beginning is to first get a global
 
 After you got good global look, then you can start diving into the details: Do the results look good enough? How did they achieve their results? And so on, until you understand the method and their results.
 
+</div>
+
 The methodology you'll follow looks like this:
-  - First Pass: You'll read only the Title, then the Abstract and then Figures
-  - Second Pass: You'll take a look at the introduction and conclusion only
-  - Third Pass: Youl'll start diving into the method, formulas, etc
-  - Fourth Pass: Reread until you understand and can explain yourself very simply the paper without having any questions left in your mind
+  - **First Pass:** You'll read only the Title, then the Abstract and then Figures
+  - **Second Pass:** You'll take a look at the introduction and conclusion only
+  - **Third Pass:** Youl'll start diving into the method, formulas, etc
+  - **Fourth Pass:** Reread until you understand and can explain yourself very simply the paper without having any questions left in your mind
 
 In the following sections, we'll read this paper together so you can get the feel of how to read a paper, and finally you'll be reading a paper of your own later on to make sure you correctly got the process.
 
@@ -252,7 +253,7 @@ As we can see, there's a few of them and several types:
   <div> <div style="width: 350px; margin-top: 50px; margin-bottom: 80px; margin-left: 600px" class="sticky" id="stickyElement"> <img src="/images/tp-4/plots_ps_paper.png" alt="paper"> </div> </div>
 
 - Tables
-  - *Benchmarks:* All tables, from table 1 to 4, are benchmarks that compare several state-of-the-art models as well as bicubic on different upscaling factors and shows that on both image and video ESPCN (their model) outperforms every other model by a significan margin. Remember that the scale is still logarithmic since this is measuring PSNR, so even a small difference is actually quite significative.
+  - *Benchmarks:* All tables, from table 1 to 4, are benchmarks that compare several state-of-the-art models as well as bicubic on different upscaling factors and shows that on both image and video ESPCN (their model) outperforms every other model by a significan margin. Remember that the scale is still logarithmic since this is measuring PSNR, so even a small difference is actually quite significative. We notice that they have chosen a comprehensive enough list of image (Timofte, Set5, Set14, BSD300, BSD500, ImageNet) and video (Xiph, Ultra Video Group) datasets.
 
 ### Summarize the First Pass
 
@@ -273,7 +274,7 @@ In the second pass, you'll want to understand the context of the paper as well a
 The introduction will give a lot more context about the approach and the field and the conclusion should confirm the effectiveness of their approach and state their benchmark results. 
 
 
-### Introduction
+### The "Introduction"
 
 While diving into the introduction, we want to learn more about the field, even ideally get context of why this is needed. So we want to answer a few questions like: What are the applications of this research? What are we trying to solve? What did researchers in the field try in the past?
 
@@ -354,7 +355,13 @@ Before diving into the details of the paper, it's good to know what others have 
 
 Each of these methods has its own pros and cons, and researchers are always coming up with new and improved ways to make images sharper and clearer.
 
-### Conclusion
+#### The rest of the Introduction
+
+On top of the questions we asked ourselves, they also discuss the motivation of this research in which they mostly summarize what we've already said several times: We need to go from LR to HR space at some point and previous work has been doing it either before applying the network (e.g bicubic interpolation) or as the first layer of the network while the authors here propose to do it at the end and work mostly in LR space.
+
+I'll let you read the rest if you want more details.
+
+### The "Conclusion"
 
 <div>
   <div style="width: 350px;" class="sticky"> <img src="/images/tp-4/pixel_shuffle_paper_conclusion_p1.png" alt="paper"> </div>
@@ -394,22 +401,242 @@ Since we're in the future, it's easy for us to check that they actually went and
 Compensation"](https://arxiv.org/abs/1611.05250) which learns motion estimation based on the previous and next frame and then combines them using 3D convolutions for
 the joint processing of multiple consecutive video frames.
 
-####
-
-
-
 ## The Third Pass: Read the Rest of the Article
 
+Now that we've got a good overview of the paper from our first two passes, it's time to dive deeper into the method. This is where we'll really start to understand how the authors' approach works and what makes it innovative. Usually you'll mostly want to focus on the method and understand since you've already looked at figures and decided the method seems useful to study.
 
+<div>
+  <div style="width: 350px;" class="sticky"> <img src="/images/tp-4/pixel_shuffle_paper_method_p1.png" alt="paper"> </div>
+
+In this section, we'll focus on the "2. Method" part of the Pixel Shuffle paper. The "Method" section is the most technical and math-heavy section of a paper in general (sometimes you'll have "Appendix" sections that can go even deeper in the math details). We'll break it down step by step.
+
+### Problem Formulation
+
+Let's start by understanding how the authors formulate the super-resolution problem:
+
+</div>
+
+- We have a High Resolution (HR) image $I^{HR}$ and a Low Resolution (LR) image $I^{LR}$.
+- The goal is to estimate $I^{SR}$ (the final Super Resolution image) from $I^{LR}$.
+- $I^{LR}$ is created by applying a Gaussian filter to $I^{HR}$ and then downsampling it by a factor of $r$.
+
+This formulation is important because it defines the task: We're trying to reverse the process of downsampling and blurring to recover a possible high-resolution image.
+
+### The ESPCN (Efficient Sub-Pixel Convolutional Neural Network) Architecture
+
+<div>
+  <div style="width: 350px;" class="sticky"> <img src="/images/tp-4/pixel_shuffle_paper_method_p2.png" alt="paper"> </div>
+
+The authors introduce their Efficient Sub-Pixel Convolutional Neural Network (ESPCN). Let's break it down into its components:
+
+1. **Convolutional Layers**: The network starts with $l$ convolutional layers applied directly to the LR image $I^{LR}$. This is different from previous approaches that would first upscale the image.
+
+2. **Feature Extraction in LR Space**: By working in the low-resolution space, the network can be more efficient. It's processing fewer pixels for most of its operations.
+
+3. **Sub-Pixel Convolution Layer**: This is the key innovation. Instead of upscaling early, they introduce a special layer at the end to efficiently upscale the feature maps to high resolution.
+
+Let's look at how they describe the layers mathematically:
+
+For the first $L-1$ layers:
+
+</div>
+
+- $f^1(I^{LR}; W_1, b_1) = \phi(W_1 * I^{LR} + b_1)$: This just means that for the first layer, we apply a linear layer with a bias and an activation
+- $f^l(I^{LR}; W_{1:l}, b_{1:l}) = \phi(W_l * f^{l-1}(I^{LR}) + b_l)$: This means that for all layers after, the next one takes the previous layer as input and applies a linear layer with bias and an activation. Pretty classic.
+pixel_shuffle_paper_method_p5.png
+
+Where:
+- $W_l$ and $b_l$ are the weights and biases for layer $l$
+- $\phi$ is the activation function (they use $tanh$)
+- $*$ is the convolution operation
+
+<div>
+  <div style="width: 350px;" class="sticky"> <img src="/images/tp-4/pixel_shuffle_paper_method_p5.png" alt="paper"> </div>
+
+The final layer (the sub-pixel convolution layer) is defined as:
+
+</div>
+
+$I^{SR} = f^L(I^{LR}) = PS(W_L * f^{L-1}(I^{LR}) + b_L)$
+
+Where $PS$ is the pixel shuffle operation, which we'll explain next.
+
+
+### The Sub-Pixel Convolution Layer
+
+This is where the magic happens! The sub-pixel convolution layer is what allows the network to efficiently upscale the image at the end of the process. Here's how it works:
+
+1. The last convolutional layer produces feature maps with $r^2C$ channels, where $r$ is the upscaling factor and $C$ is the number of color channels in the output image. If you need even more details, [(re-)read the section on Super Resolution of [practical work 2 on Convolutional Neural Networks (CNNs)](/articles/cv/tp-2).
+
+2. The pixel shuffle operation ($PS$) then rearranges these feature maps into the final high-resolution image.
+
+<div>
+  <div style="width: 350px;" class="sticky"> <img src="/images/tp-4/pixel_shuffle_paper_method_p3.png" alt="paper"> </div>
+
+Mathematically, the pixel shuffle operation is defined as:
+
+$ PS(T)_{x,y,c} = T _{\lfloor x/r \rfloor, \lfloor y/r \rfloor, C \cdot r \cdot \text{mod}(y,r) + C \cdot \text{mod}(x,r) + c} $
+
+This might look complicated, but it's essentially just reshaping the tensor. It's taking groups of $r^2$ values from the feature maps and arranging them into $r \times r$ blocks in the output image.
+
+The beauty of this approach is that it allows the network to learn the upscaling filters directly, rather than using a fixed upscaling method like bicubic interpolation. This means the upscaling can be adaptive to different types of image content.
+
+Let's decompose it a bit further:
+
+#### Input and Output
+
+- $T$ is the input tensor (the feature maps from the last convolutional layer)
+- $PS(T)$ is the output tensor (the high-resolution image)
+- $x$, $y$, and $c$ are the coordinates and channel in the output image
+- $r$ is the upscaling factor (e.g., 2 for 2x upscaling, 3 for 3x upscaling)
+- $C$ is the number of channels in the output image (typically $3$ for RGB or $1$ if using a YCbCr luminance decomposition)
+
+#### Spatial Mapping
+
+The first two terms in the right-hand side, $\lfloor x/r \rfloor$ and $\lfloor y/r \rfloor$, map the output coordinates to the input coordinates:
+
+- $\lfloor x/r \rfloor$ maps the x-coordinate from the HR space to the LR space
+- $\lfloor y/r \rfloor$ maps the y-coordinate from the HR space to the LR space
+
+<notequote>
+
+*The floor operation ($\lfloor \rfloor$) ensures we get integer coordinates in the LR space.*
+
+</notequote>
+
+When we say "$\lfloor x/r \rfloor$ maps the x-coordinate from the HR space to the LR space", we're describing how we find the corresponding position in the low-resolution (LR) input for each position in the high-resolution (HR) output. Let's dive deeper:
+
+1. **Coordinate Systems**:
+   - In the HR output, x ranges from 0 to (rW - 1), where W is the width of the LR input.
+   - In the LR input, x ranges from 0 to (W - 1).
+
+2. **The Division**:
+   - $x/r$ scales down the HR coordinate by a factor of r.
+   - For example, if $r = 2$, then HR coordinates 0 and 1 both map to 0/2 = 0 in LR space, 
+     HR coordinates 2 and 3 both map to 1 in LR space, and so on.
+
+3. **The Floor Function**:
+   - $\lfloor \rfloor$ (floor function) rounds down to the nearest integer.
+   - This ensures we always get a valid integer coordinate in the LR space.
+
+Let's look at a concrete example with $r = 2$ (2x upscaling):
+
+```
+HR x:  0  1  2  3  4  5  6  7
+       |  |  |  |  |  |  |  |
+       v  v  v  v  v  v  v  v
+LR x:  0     1     2     3
+```
+
+- For HR $x = 0$ or $1$: $\lfloor 0/2 \rfloor = \lfloor 1/2 \rfloor = 0$ in LR
+- For HR $x = 2$ or $3$: $\lfloor 2/2 \rfloor = \lfloor 3/2 \rfloor = 1$ in LR
+- For HR $x = 4$ or $5$: $\lfloor 4/2 \rfloor = \lfloor 5/2 \rfloor = 2$ in LR
+- And so on...
+
+This mapping is crucial because it tells us which pixel in the LR input corresponds to each 2x2 block in the HR output. The network has learned to pack the information for each of these 2x2 HR blocks into the channels of a single LR pixel.
+
+By using this mapping, the pixel shuffle operation knows exactly where in the LR input to find the information for each HR output pixel. This is what allows the network to efficiently upscale the image while working primarily in LR space.
+
+It's crucial to understand the idea that this mapping is what makes the pixel shuffle operation achieves such good results in super-resolution tasks.
+
+#### Channel Mapping
+
+The last part of the formula, $C \cdot r \cdot \text{mod}(y,r) + C \cdot \text{mod}(x,r) + c$, is responsible for selecting the correct channel from the input tensor. Let's break it down further:
+
+</div>
+
+- $\text{mod}(y,r)$ gives the y-offset within each $r \times r$ block
+- $\text{mod}(x,r)$ gives the x-offset within each $r \times r$ block
+- $C \cdot r \cdot \text{mod}(y,r)$ selects the correct row of channels
+- $C \cdot \text{mod}(x,r)$ selects the correct column of channels
+- $c$ selects the specific channel within the selected group
+
+
+
+### Training the Network
+
+<div>
+  <div style="width: 350px;" class="sticky"> <img src="/images/tp-4/pixel_shuffle_paper_method_p4.png" alt="paper"> </div>
+
+
+The authors train their network using mean squared error (MSE) as the loss function:
+
+$\ell(W _{1:L}, b _{1:L}) = \frac{1}{r^2HW} \sum _{x=1}^{rH} \sum _{y=1}^{rW} (I^{HR} _{x,y} - f^L _{x,y}(I^{LR}))^2$
+
+<questionquote>
+
+**We might question:** Were there any better choices of loss function?
+
+</questionquote>
+
+Many other approaches like perceptual losses that enable using features from pretrained models or Structural Similarity Index (SSIM) to compare higher level features of the images instead of pixels like MSE would.
+
+However, let's remember that at this time, such losses were not common practice and not yet as developed as today. Furthermore, they use Peak Signal-to-Noise Ratio (PSNR) as a metric to judge image quality and it turns out: MSE is a direct optimizer to PSNR!
+
+The formula of PSNR is the following:
+
+</div>
+
+$PSNR = 10 \cdot \log_{10} \left(\frac{MAX_I^2}{MSE}\right)$
+
+It includes MSE inside it! Meaning that PSNR is a monotonically decreasing function of MSE, so the loss is directly optimizing the metric we are using to judge our model quality.
+
+So, for all these reasons they used MSE at the time but it's always a good idea to question and ask why a particular metric (or anything else) was being used instead of another. It's not because that this is a paper that it is perfect.
+
+<notequote>
+
+Remember: **Doing research is to question everything!**
+
+</notequote>
+
+### The rest
+
+We've finally got a good understanding of the method, we can build the network architecture and train the model. What's left to look at is to see their actual Experiments: What datasets they've used, how other methods they've tried score, and more specific implementation details (e.g. hyperparameters used).
+
+Usually this part is much simpler to understand if you've understood the method since you know what is needed to make the approach function. We won't dive too deep in this section since we've already mentioned the tables and plots previously.
+
+It's also the part that you'll come back to several times while you are implementing the paper and trying to either reproduce their results or find the best hyperparameters for your own use case. In this paper, we can find these details in `3.2. Implementation details`.
+
+Finally, take some time to read the results on all their datasets, you might spot strengths and weaknesses of their model that they won't always explicitly mention.
+
+#### Fourth Pass: Reread and Focus on Parts You Didn't Understand
+
+This last part is simply going back to the method, trying to see if you're still missing anything, if there are still questions. Any question that's left, should guide your rereading of the paper, because you want to find an answer to this question. Sometimes, for established papers, you can find external content like blog posts or even videos of people trying to explain the context in an easier way. However, that's not always possible if the paper is too recent.
+
+On top of that, if you're struggling on more fundamental concepts, let's say you forgot specific rules of calculus, you'll have to look into learning those concepts before pursuing the paper, otherwise you'll get confused and won't be able to advance and understand how a particular formula came to be or why it works.
+
+Finally, it's also possible to ask questions to people around you, for example, if you're studying a paper with a group of peoplem, it can be beneficial to discuss the paper together and that each person explains it their way. It might be able to shed light if someone understood something differently or has figured out a different, maybe easier, intuition to the problem.
 
 # It's Your Turn!
 
+Now you should be ready to tackle another paper. This article gave you some tools and you need to try them out yourself on a different paper and see how this methodology can help you better go through research. You won't become an expert after only reading one paper: It takes a while to learn all the reflexes and why they make sense!
+
+## Exercise: Paper Report
+
 <exercisequote class="dark:bg-slate-800">
 
-Read one of the following papers and take notes. On top of that, you'll have to explain the order in which you read the paper and your thought process, things you didn't understand, the research you did externally to the paper (Google searches, reading other papers, articles, blogs, etc), what confused you, etc. 
+Read one of the papers cited in this article and take notes. On top of that, you'll have to explain the order in which you read the paper and your thought process, things you didn't understand, the research you did externally to the paper (Google searches, reading other papers, articles, blogs, etc), what confused you, etc.
+
+</exercisequote>
+
+You'll have to choose one of the papers that were cited throughout this article (except the Pixel Shuffle paper obviously), so there's plenty of choice. If you want to dive into a specific paper that isn't cited here, please send it to me so I can approve it.
 
 **You'll be sending a written report as your practical work!**
 
-Please follow the analysis we did above as your report structure.
+Follow a similar analysis to what we did above as your report structure. You can send me a PDF, a Google Doc or anything that's relevant. Please do not send a simple unformatted (e.g. `.txt`) file.
 
-</exercisequote>
+## You're Done!
+
+Great job, you made it this far!
+
+### Class Students
+
+Send it on the associated MS Teams Assignment.
+
+### Anyone else
+
+Send it to my [email adress](mailto:chady1.dimachkie@epita.fr?subject=TP%204) with the subject **Practical Work 4**: [chady1.dimachkie@epita.fr](mailto:chady1.dimachkie@epita.fr?subject=Practical%20Work%204)
+
+**Don't hesitate if you have any questions!**
+
+→ [More Articles](/articles/)

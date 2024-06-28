@@ -460,4 +460,4 @@ Send it to my [email adress](mailto:chady1.dimachkie@epita.fr?subject=TP%202) wi
 
 **Don't hesitate if you have any questions!**
 
-→ [Coming Next: Practical Work 3](/articles/tp-3)
+→ [Coming Next: Practical Work 3](/articles/cv/tp-3)

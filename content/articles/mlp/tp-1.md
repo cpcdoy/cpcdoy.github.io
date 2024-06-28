@@ -491,4 +491,4 @@ Send it my [email adress](mailto:chady1.dimachkie@epita.fr?subject=TP%201) with 
 
 **Don't hesitate if you have any questions!**
 
-→ [Coming Next: Practical Work 2](/articles/tp-2)
+→ [Coming Next: Practical Work 2](/articles/cv/tp-2)

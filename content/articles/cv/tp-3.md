@@ -746,4 +746,4 @@ Send it to my [email adress](mailto:chady1.dimachkie@epita.fr?subject=TP%203) wi
 
 **Don't hesitate if you have any questions!**
 
-→ [Coming Next: Practical Work 4](/articles/)
+→ [Coming Next: Practical Work 4](/articles/others/tp-4)
