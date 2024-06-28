@@ -125,7 +125,7 @@ Actually it does!
 
 The authors of the paper decided that they'll keep the variance fixed and let the neural network learn only the mean $\mu_{\theta}$, so the variance above becomes: $\Sigma_\theta (x_{t},t) = \sigma^2_t \mathbf{I}$ and they set $\sigma^2 = \beta_t$, we come back to our $\beta_t$ constants from above!
 
-<notequote>
+<notequote class="dark:bg-slate-800">
 Later research shows that it's actually better to learn the variance too during the backward diffusion process, so newer diffusion model architectures also learn both mean and variance.
 </notequote>
 
@@ -147,7 +147,7 @@ $q(x_t|x_0) = \mathcal{N}(x_t; \sqrt{\overline{\alpha_t}}x_0,(1 - \overline{\alp
 
 What do you notice? We were able to rewrite the forward process $q$ so that instead of having to loop from $x_0$ to $x_1$, ..., $x_t$, we can do it by simply using our first image $x_0$ and simply doing a product of the $\alpha_s$ from $s=1$ to $s=t$ and giving it to our forward process. Basically, this shows that we can just sample Gaussian noise and scale it appropriately (using the $\alpha_s$) and add it to $x_0$ to get $x_t$ directly. Let's not forget that the $\alpha_s$ are just $\alpha_t = 1 - \beta_t$, so a function of $\beta_t$ which we already precalculated above with our linear schedule.
 
-<notequote>
+<notequote class="dark:bg-slate-800">
 This property will allow us to optimize random terms of the loss function L since we can now get to any time step t from t=0
 </notequote>
 
@@ -167,7 +167,7 @@ $L_{t-1} = || \mathbf{\epsilon} - \mathbf{\epsilon}_\theta(x_t, t) ||^2 $
 
 $L_{t-1} = || \mathbf{\epsilon} - \mathbf{\epsilon}_\theta( \sqrt{\bar{\alpha}_t} x_0 + \sqrt{(1- \bar{\alpha}_t)  } \mathbf{\epsilon}, t) ||^2.$
 
-<notequote>
+<notequote class="dark:bg-slate-800">
 There should be constants left, on the left side of the formula, that depend on β but the authors just removed them to simplify the final loss and constants don't usually affect things much.
 </notequote>
 
@@ -546,7 +546,7 @@ To understand the neural network required for this task, let's break it down ste
 
 Usually, a network architecture called an *Autoencoder* is used here. Autoencoders feature a "bottleneck" layer ([literally like the neck of a bottle where water comes out of at a lower specific rate](https://www.leaneast.com/wp-content/uploads/2020/11/Bottlenecks-177x300.png)) between the encoder and decoder. The encoder compresses the image into a smaller hidden representation, and the decoder reconstructs the image from this representation. This design ensures that the network captures only the most crucial information in the bottleneck layer.
 
-<notequote>
+<notequote class="dark:bg-slate-800">
 The "bottleneck" is called like that because it's a place in the network which can't encode a lot of information and this forces the network to compress efficiently the information if it wants to reuse it or even reconstruct it later!
 </notequote>
 
@@ -622,7 +622,7 @@ As we've seen, the diffusion process is time dependent where we have the value $
 
 To implement this, the authors actually use the positional encoding method from Transformers (From the foundational paper "Attention Is All You Need" by [Vaswani et al. 2017](https://arxiv.org/abs/1706.03762)).
 
-<notequote>
+<notequote class="dark:bg-slate-800">
 The Transformer architecture, unlike others that use recurrence (like Recurrent Neural Networks (RNNs, LSTMs, GRUs, etc) by having loops in their architecture, can't encode time. This means that any part of the input or output during training can be looked at in no particular order. Imagine teaching a model to learn to predict the next word in a sentence while it can actually look at words in the future. It doesn't work like that!
 </notequote>
 
@@ -636,7 +636,7 @@ $PE_{(pos, 2i+1)} = \cos \left( \frac{pos}{10000^{\frac{2i}{d}}} \right)$
 
 They basically create several sine and cosine functions with different frequencies, so imagine creating a matrix where each row will contain a new sine/cosine function that oscillates different (higher or lower frequency for each). This basically helps introduces assign a frequency to each time step, meaning that at a specific time step we will add a specific frequency to its embeddings so that, the exact same input at a different time step will have this specific frequency added that will say to the network "Ok, it's the same image but with a different time step, so it should be processed differently according to the current noise level of timestep $t$".
 
-<notequote>
+<notequote class="dark:bg-slate-800">
 In the case of Natural Language Processing (NLP) where we process text, a model will need to assign a specific sine/cosine frequency for each word since each word comes at a new time step t, similarly to how we speak, we say each word one after the other.
 </notequote>
 
@@ -750,4 +750,4 @@ Send it to my [email adress](mailto:chady1.dimachkie@epita.fr?subject=TP%203) wi
 
 **Don't hesitate if you have any questions!**
 
-→ [Coming Next: Practical Work 4](/articles/)
+→ [Coming Next: Practical Work 4](/articles/others/tp-4)

@@ -165,7 +165,7 @@ The *loss function* is a function that helps us compute a distance between of ho
 
 A simple and common loss function is the *[Mean Squared Error](https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html) loss* (also called *squared L2 norm*): $\frac{1}{n}\sum{(y_i - \hat{y}_i)^2}$, where $y_i$ is the ground truth and $\hat{y}_i$ is the predicted value from our model.
 
-<notequote>
+<notequote class="dark:bg-slate-800">
 Why not just use the difference without squaring? Because the squaring actually penalizes mistakes and outliers more!
 </notequote>
 
@@ -182,7 +182,7 @@ This is basically a representation of the loss values around the weight space of
 
 The <span style="color: blue">lower</span> we are in the landscape, the closer we get to a good solution. Furthermore, you can see that we start from a **point** quite <span style="color: red">high</span> in the lanscape (the pseudo-random initialization of the network which we hope is good enough) and then, using an optimizer, we <span style="color: green">explore by following the gradients</span> of what the loss is telling us until we reach a <span style="color: blue">good enough weight set</span> where our model performs well.
 
-<notequote>
+<notequote class="dark:bg-slate-800">
 It's very probable that we'll miss the most optimal solution when navigating in the loss landscape. In practice, we'll find there are many quasi-optimal solutions that exist that are sufficient.
 </notequote>
 
@@ -264,7 +264,7 @@ Your browser does not support MP4 videos somehow...
 
 As we can see, our model converges very fast which makes sense since it really doesn't have much parameters to learn to represent our dataset. On top of that, our network isn't very expressive in what it can do, it can basically only fit a line so that's why every point is actually on a line. It can't fit the intricacies of our dataset. We also plot the loss function's value which keeps decreasing the better we are able to fit the train data.
 
-<notequote>
+<notequote class="dark:bg-slate-800">
 In this specific case, it's a good thing that our model doesn't try to fit every exact point because we know that the underlying distribution is just linear with some noise. If the model were to fit every exact point then it'd be overfitting. And if it wasn't even fitting the shape of the distribution it'd be underfitting.
 </notequote>
 
@@ -491,4 +491,4 @@ Send it my [email adress](mailto:chady1.dimachkie@epita.fr?subject=TP%201) with 
 
 **Don't hesitate if you have any questions!**
 
-→ [Coming Next: Practical Work 2](/articles/tp-2)
+→ [Coming Next: Practical Work 2](/articles/cv/tp-2)
