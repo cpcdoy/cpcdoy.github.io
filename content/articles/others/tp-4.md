@@ -498,12 +498,6 @@ The first two terms in the right-hand side, $\lfloor x/r \rfloor$ and $\lfloor y
 - $\lfloor x/r \rfloor$ maps the x-coordinate from the HR space to the LR space
 - $\lfloor y/r \rfloor$ maps the y-coordinate from the HR space to the LR space
 
-<notequote class="dark:bg-slate-800">
-
-*The floor operation ($\lfloor \rfloor$) ensures we get integer coordinates in the LR space.*
-
-</notequote>
-
 When we say "$\lfloor x/r \rfloor$ maps the x-coordinate from the HR space to the LR space", we're describing how we find the corresponding position in the low-resolution (LR) input for each position in the high-resolution (HR) output. Let's dive deeper:
 
 1. **Coordinate Systems**:
