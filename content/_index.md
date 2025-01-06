@@ -47,7 +47,7 @@ button:hover, a:hover {
 <body>
 
 <div class="card" style="; margin-right: 10px; margin-left: -20px">
-  <img src="https://media.licdn.com/dms/image/C5603AQF6nGI5Do10fA/profile-displayphoto-shrink_400_400/0/1543554780766?e=1723680000&v=beta&t=Idx_0Cv7FBtw0m74xsAZ2aiik6RA_OeATDCnLDad8ek" alt="Chady" style="width:250px; height:250px;  border-radius: 50%; margin-top: 20px; object-fit: cover;">
+  <img src="/images/profile_pic_crop.png" alt="Chady" style="width:250px; height:250px;  border-radius: 50%; margin-top: 20px; object-fit: cover;">
   <h1>Chady Dimachkie</h1>
   <p class="title">Head of ML | Deep Learning Teacher</p>
   <div style="margin: 24px 0;">
